@@ -23,7 +23,7 @@ func (u *authUseCase) Register(user *models.User) (*models.UserWithToken, error)
 		return nil, errors.Wrap(err, "authUseCase.Register.UserExists")
 	}
 
-	if err := user.HashPassword(); err != nil {
+	if err = user.HashPassword(); err != nil {
 		return nil, errors.Wrap(err, "authUseCase.Register.HashPassword")
 	}
 
@@ -48,7 +48,7 @@ func (u *authUseCase) Login(user *models.User) (*models.UserWithToken, error) {
 		return nil, errors.Wrap(err, "authUseCase.Login.FindByName")
 	}
 
-	if err := foundUser.ComparePasswords(user.Password); err != nil {
+	if err = foundUser.ComparePasswords(user.Password); err != nil {
 		return nil, errors.Wrap(err, "authUseCase.Login.ComparePasswords")
 	}
 
