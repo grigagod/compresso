@@ -23,6 +23,15 @@ func NewAuthHandlers(cfg *config.Config, authUC auth.UseCase) *authHandlers {
 	}
 }
 
+// Register godoc
+// @Summary Register new user
+// @Description register new user, returns user and token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param user body AuthRequest true "user credentials"
+// @Success 201 {object} models.UserWithToken
+// @Router /register [post]
 func (h *authHandlers) Register() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req AuthRequest
@@ -47,6 +56,15 @@ func (h *authHandlers) Register() http.HandlerFunc {
 	}
 }
 
+// Login godoc
+// @Summary Login new user
+// @Description login user, returns user and token
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param creds body AuthRequest true "user credentials"
+// @Success 200 {object} models.UserWithToken
+// @Router /login [post]
 func (h *authHandlers) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req AuthRequest

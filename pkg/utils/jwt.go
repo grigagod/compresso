@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// JWT Claims struct
+// Claims holds jwt claims.
 type Claims struct {
 	ID uuid.UUID `json:"id"`
 	jwt.StandardClaims
@@ -40,13 +40,13 @@ func GenerateJWTToken(id uuid.UUID, expires time.Duration, JwtSecretKey string) 
 }
 
 // ExtractJWTFromRequest extracts JWT claims form request.
-func ExtractJWTFromRequest(r *http.Request, JwtSecretKey string) (*Claims, error) {
+func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*Claims, error) {
 	// Get the JWT string
 	tokenString := ExtractBearerToken(r)
 
 	// Parse the JWT string
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(JwtSecretKey), nil
+		return []byte(jwtSecretKey), nil
 	})
 
 	if err != nil {

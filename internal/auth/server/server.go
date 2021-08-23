@@ -13,6 +13,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/jmoiron/sqlx"
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	_ "github.com/grigagod/compresso/docs" // load API Docs files (Swagger)
 )
 
 type Server struct {
@@ -27,11 +30,25 @@ func NewServer(cfg *config.Config, db *sqlx.DB) *Server {
 	}
 }
 
+// @title Auth service
+// @version 1.0
+// @description This is an auto-generated API Docs.
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email podkidysh2002@gmail.com
 func (s *Server) Run() {
 	router := mux.NewRouter()
 
 	s.MapHandlers(router)
+	// enable pprof
 	router.PathPrefix("/debug/pprof/").Handler(http.DefaultServeMux)
+
+	router.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://127.0.0.1:5000/swagger/doc.json"),
+		httpSwagger.DeepLinking(true),
+		httpSwagger.DocExpansion("none"),
+		httpSwagger.DomID("#swagger-ui"),
+	))
 
 	srv := http.Server{
 		Addr:         s.cfg.Server.Addr,
@@ -60,10 +77,12 @@ func (s *Server) Run() {
 	defer cancel()
 	// Doesn't block if no connections, but will otherwise wait
 	// until the timeout deadline.
-	srv.Shutdown(ctx)
-	// Optionally, you could run srv.Shutdown in a goroutine and block on
-	// <-ctx.Done() if your application should wait for other services
+
+	err := srv.Shutdown(ctx)
+	if err != nil {
+		log.Println(err)
+	}
+	// Optionally, you could run srv.Shutdown in a goroutine and block on	// <-ctx.Done() if your application should wait for other services
 	// to finalize based on context cancellation.
 	log.Println("shutting down")
-	os.Exit(0)
 }
