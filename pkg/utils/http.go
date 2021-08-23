@@ -33,5 +33,4 @@ func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(resp)
-
 }

@@ -20,7 +20,7 @@ func NewAuthUseCase(cfg *config.Config, authRepo auth.Repository) auth.UseCase {
 func (u *authUseCase) Register(user *models.User) (*models.UserWithToken, error) {
 	existsUser, err := u.authRepo.FindByName(user.Username)
 	if existsUser != nil || err == nil {
-		return nil, errors.Wrap(err, "authUseCase.Register.UserExists")
+		return nil, errors.New("authUseCase.Register.UserExists")
 	}
 
 	if err = user.HashPassword(); err != nil {

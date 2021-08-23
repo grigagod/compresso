@@ -38,6 +38,7 @@ func (h *authHandlers) Register() http.HandlerFunc {
 
 		if err := utils.StructScan(r, &req); err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
 		user, err := h.authUC.Register(&models.User{
@@ -49,10 +50,10 @@ func (h *authHandlers) Register() http.HandlerFunc {
 
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
 		utils.RespondWithJSON(w, http.StatusCreated, user)
-
 	}
 }
 
@@ -71,6 +72,7 @@ func (h *authHandlers) Login() http.HandlerFunc {
 
 		if err := utils.StructScan(r, &req); err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
 		user, err := h.authUC.Login(&models.User{
@@ -79,6 +81,7 @@ func (h *authHandlers) Login() http.HandlerFunc {
 		})
 		if err != nil {
 			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
+			return
 		}
 
 		utils.RespondWithJSON(w, http.StatusOK, user)
