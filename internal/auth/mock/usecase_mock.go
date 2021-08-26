@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	models "github.com/grigagod/compresso/internal/auth/models"
+	models "github.com/grigagod/compresso/internal/models"
 )
 
 // MockUseCase is a mock of UseCase interface.

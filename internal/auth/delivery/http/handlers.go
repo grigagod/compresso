@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
-	"github.com/grigagod/compresso/internal/auth/models"
+	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/pkg/utils"
 )
 
@@ -16,7 +16,7 @@ type authHandlers struct {
 	authUC auth.UseCase
 }
 
-func NewAuthHandlers(cfg *config.Config, authUC auth.UseCase) *authHandlers {
+func NewAuthHandlers(cfg *config.Config, authUC auth.UseCase) auth.Handlers {
 	return &authHandlers{
 		cfg:    cfg,
 		authUC: authUC,

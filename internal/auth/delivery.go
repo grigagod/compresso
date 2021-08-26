@@ -2,7 +2,7 @@ package auth
 
 import "net/http"
 
-type Handler interface {
+type Handlers interface {
 	Register() http.HandlerFunc
 	Login() http.HandlerFunc
 }

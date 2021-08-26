@@ -3,7 +3,7 @@ package usecase
 import (
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
-	"github.com/grigagod/compresso/internal/auth/models"
+	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/pkg/utils"
 	"github.com/pkg/errors"
 )

@@ -8,8 +8,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/auth/mock"
-	"github.com/grigagod/compresso/internal/auth/models"
 	"github.com/grigagod/compresso/internal/auth/usecase"
+	"github.com/grigagod/compresso/internal/models"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 )

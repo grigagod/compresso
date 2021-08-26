@@ -2,7 +2,7 @@ package repo
 
 import (
 	"github.com/grigagod/compresso/internal/auth"
-	"github.com/grigagod/compresso/internal/auth/models"
+	"github.com/grigagod/compresso/internal/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
