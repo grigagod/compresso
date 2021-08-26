@@ -1,23 +1,20 @@
-package config
+package server
 
 import (
 	"log"
 	"time"
 
-	"github.com/grigagod/compresso/internal/server"
 	"github.com/grigagod/compresso/pkg/utils"
 )
 
-// Config stores auth service config.
+// Config stores http server config.
 type Config struct {
-	Server server.Config
-	Auth
-}
-
-// Auth stores jwt config.
-type Auth struct {
-	JwtSecretKey string
-	JwtExpires   time.Duration
+	Addr         string
+	PprofPort    string
+	SwaggerUrl   string
+	WriteTimeout time.Duration
+	ReadTimeout  time.Duration
+	IdleTimeout  time.Duration
 }
 
 func LoadConfig(filepath string) (*Config, error) {
