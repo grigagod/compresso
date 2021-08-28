@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/spf13/viper"
 )
@@ -21,4 +22,13 @@ func LoadConfig(filepath string) (*viper.Viper, error) {
 	}
 
 	return v, nil
+}
+
+// GetConfigPath returns config path for local or docker environment.
+func GetConfigPath(serviceName, configEnv string) string {
+	if configEnv == "docker" {
+		return fmt.Sprintf("./config/%s/config-docker", serviceName)
+	}
+
+	return fmt.Sprintf("./config/%s/config-local", serviceName)
 }

@@ -2,33 +2,29 @@ version: "3.8"
 
 services:
   auth:
-    container_name: auth
     build:
       context: ./
-      dockerfile: ./docker/auth.Dockerfile
+      dockerfile: docker/auth/Dockerfile
     ports:
       - "5000:5000"
     depends_on:
       postgresql:
         condition: service_healthy
     restart: always
-    volumes:
-      - ./:/auth
     networks:
       - web_api
 
   postgresql:
     image: postgres:12-alpine
-    container_name: postgesql
     ports:
       - "5432:5432"
     restart: always
+    volumes:
+      - ${HOME}/pgdata/:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=121073
-      - POSTGRES_DB=auth
-    volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - POSTGRES_DB=compresso
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
@@ -37,12 +33,12 @@ services:
       start_period: 1s
     networks:
       - web_api
-
+  
   migrate:
     image: migrate/migrate
     volumes: 
       - ./migrations:/migrations
-    command: ["-path", "/migrations/auth", "-database",  "postgres://postgres:121073@postgresql:5432/auth?sslmode=disable", "up", "1"]
+    command: ["-path", "/migrations", "-database",  "postgres://postgres:121073@postgresql:5432/compresso?sslmode=disable", "up", "1"]
     depends_on:
       postgresql:
         condition: service_healthy
@@ -52,3 +48,4 @@ services:
 networks:
   web_api:
     driver: bridge
+

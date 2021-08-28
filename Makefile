@@ -1,37 +1,58 @@
-.PHONY: clean test docker auth
+.PHONY: clean test auth build run local
 
 BUILD_DIR = $(PWD)/build
-AUTH_MIGRATIONS= $(PWD)/migrations/auth
-AUTH_DATABASE = postgres://postgres:121073@localhost/auth?sslmode=disable
+MIGRATIONS= $(PWD)/migrations/
+DATABASE = postgres://postgres:121073@localhost/compresso?sslmode=disable
 
 test: 
 	go test -v -timeout 30s -cover ./...
 
-auth.migrate.up:
-	migrate -path $(AUTH_MIGRATIONS) -database "$(AUTH_DATABASE)" up
-
-auth.migrate.down:
-	migrate -path $(AUTH_MIGRATIONS) -database "$(AUTH_DATABASE)" down
-
-auth.migrate.force:
-	migrate -path $(AUTH_MIGRATIONS) -database "$(AUTH_DATABASE)" force $(version)
-
 lint:
 	golangci-lint run ./...
 
-swag:
-	echo "Starting swagger generating"
-	swag init -g **/**/*.go
+# ==============================================================================
+# MIGRATIONS
+
+
+migrate.up:
+	migrate -path $(MIGRATIONS) -database "$(DATABASE)" up
+
+migrate.down:
+	migrate -path $(MIGRATIONS) -database "$(DATABASE)" down
+
+migrate.force:
+	migrate -path $(MIGRATIONS) -database "$(DATABASE)" force $(version)
+
+# ==============================================================================
+# Auth service
+
+auth.clean:
+	rm $(BUILD_DIR)/auth
+
+auth.build: clean
+	go build -ldflags="-w -s" -o $(BUILD_DIR)/auth cmd/auth/main.go
+
+auth.run: auth.clean auth.build
+	$(BUILD_DIR)/auth
+
+auth.swag:
+	swag init -g cmd/auth/main.go -o docs/auth --exclude internal/image
+
 
 # ==============================================================================
 # Docker compose commands
 
-docker.build:
-	echo "Starting docker environment"
-	docker-compose -f docker-compose.yml up --build
+local:
+	echo "Starting local environment"
+	docker-compose -f docker-compose.local.yml up --build -d
 
-docker.run:
-	docker-compose -f docker-compose.yml up
+local.stop:
+	docker-compose -f docker-compose.local.yml down
+
+develop:
+	echo "Starting docker environment"
+	docker-compose -f docker-compose.dev.yml up --build
+
 # ==============================================================================
 # Docker support
 

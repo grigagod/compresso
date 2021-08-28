@@ -19,7 +19,7 @@ func NewAuthServer(authCfg *config.Config, db *sqlx.DB) *AuthServer {
 	return &AuthServer{
 		authCfg: authCfg,
 		Server: &server.Server{
-			Cfg:    &authCfg.Server,
+			Cfg:    authCfg.Server,
 			Db:     db,
 			Router: mux.NewRouter(),
 			Logger: log.Default(),

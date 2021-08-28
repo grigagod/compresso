@@ -1,7 +1,9 @@
+CREATE SCHEMA IF NOT EXISTS auth AUTHORIZATION postgres;
+
 -- Add UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS auth.users (
     user_id    UUID PRIMARY KEY,
     username   TEXT UNIQUE NOT NULL,
     password   TEXT NOT NULL,

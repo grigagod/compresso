@@ -6,7 +6,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
-	"github.com/grigagod/compresso/internal/auth/models"
+	"github.com/grigagod/compresso/internal/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
 )

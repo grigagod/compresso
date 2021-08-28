@@ -3,7 +3,6 @@ package usecase_test
 import (
 	"database/sql"
 	"testing"
-	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/grigagod/compresso/internal/auth/config"
@@ -20,12 +19,7 @@ func TestAuthUseCase_Register(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	cfg := config.Config{
-		Auth: config.Auth{
-			JwtSecretKey: "secret",
-			JwtExpires:   time.Minute,
-		},
-	}
+	cfg := config.Config{}
 
 	mockAuthRepo := mock.NewMockRepository(ctrl)
 	authUC := usecase.NewAuthUseCase(&cfg, mockAuthRepo)
@@ -50,12 +44,7 @@ func TestAuthUseCase_Login(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	cfg := config.Config{
-		Auth: config.Auth{
-			JwtSecretKey: "secret",
-			JwtExpires:   time.Hour,
-		},
-	}
+	cfg := config.Config{}
 
 	mockAuthRepo := mock.NewMockRepository(ctrl)
 	authUC := usecase.NewAuthUseCase(&cfg, mockAuthRepo)

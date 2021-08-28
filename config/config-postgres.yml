@@ -1,6 +1,0 @@
-Host: postgresql
-Port: 5432
-User: postgres
-DbName: auth
-Password: 121073
-Driver: pgx

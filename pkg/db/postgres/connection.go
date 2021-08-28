@@ -16,16 +16,16 @@ const (
 )
 
 // Return new Postgresql db instance
-func NewPsqlDB(c *Config) (*sqlx.DB, error) {
+func NewPsqlDB(host string, port string, user string, dbname string, password string, driver string) (*sqlx.DB, error) {
 	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
-		c.Host,
-		c.Port,
-		c.User,
-		c.DbName,
-		c.Password,
+		host,
+		port,
+		user,
+		dbname,
+		password,
 	)
 
-	db, err := sqlx.Connect(c.Driver, dataSourceName)
+	db, err := sqlx.Connect(driver, dataSourceName)
 	if err != nil {
 		return nil, err
 	}

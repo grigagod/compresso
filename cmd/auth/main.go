@@ -2,12 +2,14 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/auth/server"
 	"github.com/grigagod/compresso/pkg/db/postgres"
+	"github.com/grigagod/compresso/pkg/utils"
 
-	_ "github.com/grigagod/compresso/docs" // load API Docs files (Swagger)
+	_ "github.com/grigagod/compresso/docs/auth" // load API Docs files (Swagger)
 )
 
 // @title Auth service
@@ -19,17 +21,13 @@ import (
 func main() {
 	log.Println("Starting auth server")
 
-	authCfg, err := config.LoadConfig("./internal/auth/config/config-local")
+	authCfg, err := config.LoadConfig(utils.GetConfigPath("auth", os.Getenv("config-auth")))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pgCfg, err := postgres.LoadConfig("./config/config-postgres")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db, err := postgres.NewPsqlDB(pgCfg)
+	db, err := postgres.NewPsqlDB(authCfg.DB.Host, authCfg.DB.Port, authCfg.DB.User,
+		authCfg.DB.DbName, authCfg.DB.Password, authCfg.DB.Driver)
 	if err != nil {
 		log.Fatal("Postgres connection failed:", err)
 	}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -13,7 +14,7 @@ import (
 )
 
 type Server struct {
-	Cfg    *Config
+	Cfg    Config
 	Router *mux.Router
 	Db     *sqlx.DB
 	Logger *log.Logger
@@ -29,35 +30,33 @@ func (s *Server) Start() {
 		IdleTimeout:  s.Cfg.IdleTimeout,
 		Handler:      s.Router,
 	}
+	// channel for graceful shutdown
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
+	// gracefully shutdown server on SIGINT, SIGTERM
 	go func() {
 
 		s.Logger.Printf("Server is listening on Addr: %s", s.Cfg.Addr)
-		if err := srv.ListenAndServe(); err != nil {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			s.Logger.Fatal("Error starting Server: ", err)
 		}
 	}()
 
-	c := make(chan os.Signal, 1)
-	// We'll accept graceful shutdowns when quit via SIGINT (Ctrl+C)
-	// SIGKILL, SIGQUIT or SIGTERM (Ctrl+/) will not be caught.
-	signal.Notify(c, os.Interrupt)
+	<-done
+	s.Logger.Println("Server is shutting down")
 
-	// Block until we receive our signal.
-	<-c
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		// extra handling here
+		cancel()
+	}()
 
-	// Create a deadline to wait for.
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-	// Doesn't block if no connections, but will otherwise wait
-	// until the timeout deadline.
+	if err := srv.Shutdown(ctx); err != nil {
+		s.Logger.Fatalf("Server Shutdown Failed:%+v", err)
 
-	err := srv.Shutdown(ctx)
-	if err != nil {
-		s.Logger.Println(err)
 	}
-	// Optionally, you could run srv.Shutdown in a goroutine and block on	// <-ctx.Done() if your application should wait for other services
-	// to finalize based on context cancellation.
-	s.Logger.Println("shutting down")
+
+	s.Logger.Print("Server Exited Properly")
 
 }
