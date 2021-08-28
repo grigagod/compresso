@@ -7,7 +7,7 @@ services:
       - "5432:5432"
     restart: always
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ${HOME}/pgdata/:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=121073
