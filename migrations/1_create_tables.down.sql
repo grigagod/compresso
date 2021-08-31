@@ -1,3 +1,5 @@
-DROP TABLE IF EXISTS auth.users;
+DROP TABLE IF EXISTS svc.image_tickets;
 
-DROP SCHEMA IF EXISTS auth;
+DROP TABLE IF EXISTS svc.users;
+
+DROP SCHEMA IF EXISTS svc;
