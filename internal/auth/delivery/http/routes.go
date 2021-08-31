@@ -6,6 +6,6 @@ import (
 )
 
 func MapAuthRoutes(router *mux.Router, h auth.Handlers) {
-	router.HandleFunc("/register", h.Register()).Methods("POST")
-	router.HandleFunc("/login", h.Login()).Methods("POST")
+	router.Handle("/register", h.Register()).Methods("POST")
+	router.Handle("/login", h.Login()).Methods("POST")
 }

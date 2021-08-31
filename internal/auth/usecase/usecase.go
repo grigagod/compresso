@@ -3,9 +3,9 @@ package usecase
 import (
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
+	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/pkg/utils"
-	"github.com/pkg/errors"
 )
 
 type authUseCase struct {
@@ -20,21 +20,24 @@ func NewAuthUseCase(cfg *config.Config, authRepo auth.Repository) auth.UseCase {
 func (u *authUseCase) Register(user *models.User) (*models.UserWithToken, error) {
 	existsUser, err := u.authRepo.FindByName(user.Username)
 	if existsUser != nil || err == nil {
-		return nil, errors.New("authUseCase.Register.UserExists")
+		return nil, httper.NewBadRequestMsg(httper.UserExistsMsg)
 	}
 
 	if err = user.HashPassword(); err != nil {
-		return nil, errors.Wrap(err, "authUseCase.Register.HashPassword")
+		return nil, err
 	}
 
 	createdUser, err := u.authRepo.Create(user)
 	if err != nil {
-		return nil, errors.Wrap(err, "authUseCase.Register.Create")
+		return nil, httper.ParseSqlError(err)
 	}
 
 	createdUser.SanitizePassword()
 
 	token, err := utils.GenerateJWTToken(createdUser.ID, u.cfg.JwtExpires, u.cfg.JwtSecretKey)
+	if err != nil {
+		return nil, err
+	}
 
 	return &models.UserWithToken{
 		User:  createdUser,
@@ -45,16 +48,19 @@ func (u *authUseCase) Register(user *models.User) (*models.UserWithToken, error)
 func (u *authUseCase) Login(user *models.User) (*models.UserWithToken, error) {
 	foundUser, err := u.authRepo.FindByName(user.Username)
 	if err != nil {
-		return nil, errors.Wrap(err, "authUseCase.Login.FindByName")
+		return nil, httper.ParseSqlError(err)
 	}
 
 	if err = foundUser.ComparePasswords(user.Password); err != nil {
-		return nil, errors.Wrap(err, "authUseCase.Login.ComparePasswords")
+		return nil, httper.NewBadRequestMsg(httper.WrongCredentialsMsg)
 	}
 
 	foundUser.SanitizePassword()
 
 	token, err := utils.GenerateJWTToken(foundUser.ID, u.cfg.JwtExpires, u.cfg.JwtSecretKey)
+	if err != nil {
+		return nil, err
+	}
 
 	return &models.UserWithToken{
 		User:  foundUser,

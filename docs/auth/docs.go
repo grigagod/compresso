@@ -58,6 +58,12 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/models.UserWithToken"
                         }
+                    },
+                    "400": {
+                        "description": "Provided password is wrong",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -92,6 +98,18 @@ var doc = `{
                         "schema": {
                             "$ref": "#/definitions/models.UserWithToken"
                         }
+                    },
+                    "400": {
+                        "description": "Provided password doesn't match requirements",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "409": {
+                        "description": "User with such username already exists",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -100,6 +118,10 @@ var doc = `{
     "definitions": {
         "http.AuthRequest": {
             "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
             "properties": {
                 "password": {
                     "type": "string"

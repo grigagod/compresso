@@ -29,13 +29,24 @@ func TestAuthUseCase_Register(t *testing.T) {
 		Password: "asd",
 	}
 
-	mockAuthRepo.EXPECT().FindByName(gomock.Eq(user.Username)).Return(nil, sql.ErrNoRows)
-	mockAuthRepo.EXPECT().Create(gomock.Eq(user)).Return(user, nil)
+	t.Run("Main case", func(t *testing.T) {
+		mockAuthRepo.EXPECT().FindByName(gomock.Eq(user.Username)).Return(nil, sql.ErrNoRows)
+		mockAuthRepo.EXPECT().Create(gomock.Eq(user)).Return(user, nil)
 
-	createdUser, err := authUC.Register(user)
+		createdUser, err := authUC.Register(user)
 
-	require.NoError(t, err)
-	require.NotNil(t, createdUser)
+		require.NoError(t, err)
+		require.NotNil(t, createdUser)
+
+	})
+	t.Run("Already existst", func(t *testing.T) {
+		mockAuthRepo.EXPECT().FindByName(gomock.Eq(user.Username)).Return(user, nil)
+
+		createdUser, err := authUC.Register(user)
+
+		require.Error(t, err)
+		require.Nil(t, createdUser)
+	})
 }
 
 func TestAuthUseCase_Login(t *testing.T) {
@@ -62,9 +73,30 @@ func TestAuthUseCase_Login(t *testing.T) {
 		Password: string(hashPassword),
 	}
 
-	mockAuthRepo.EXPECT().FindByName(user.Username).Return(mockUser, nil)
+	t.Run("Main case", func(t *testing.T) {
+		mockAuthRepo.EXPECT().FindByName(gomock.Eq(user.Username)).Return(mockUser, nil)
 
-	userWithToken, err := authUC.Login(user)
-	require.NoError(t, err)
-	require.NotNil(t, userWithToken)
+		userWithToken, err := authUC.Login(user)
+
+		require.NoError(t, err)
+		require.NotNil(t, userWithToken)
+
+	})
+	t.Run("User not exist", func(t *testing.T) {
+		mockAuthRepo.EXPECT().FindByName(gomock.Eq(user.Username)).Return(nil, sql.ErrNoRows)
+
+		userWithToken, err := authUC.Login(user)
+
+		require.Nil(t, userWithToken)
+		require.Error(t, err)
+	})
+	t.Run("Wrong password", func(t *testing.T) {
+		mockAuthRepo.EXPECT().FindByName(gomock.Eq(user.Username)).Return(user, nil)
+
+		userWithToken, err := authUC.Login(user)
+
+		require.Nil(t, userWithToken)
+		require.Error(t, err)
+
+	})
 }

@@ -5,6 +5,9 @@ definitions:
         type: string
       username:
         type: string
+    required:
+    - password
+    - username
     type: object
   models.UserWithToken:
     properties:
@@ -47,6 +50,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.UserWithToken'
+        "400":
+          description: Provided password is wrong
+          schema:
+            type: string
       summary: Login new user
       tags:
       - Auth
@@ -69,6 +76,14 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.UserWithToken'
+        "400":
+          description: Provided password doesn't match requirements
+          schema:
+            type: string
+        "409":
+          description: User with such username already exists
+          schema:
+            type: string
       summary: Register new user
       tags:
       - Auth

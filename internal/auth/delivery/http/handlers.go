@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
+	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/pkg/utils"
 )
@@ -31,14 +32,20 @@ func NewAuthHandlers(cfg *config.Config, authUC auth.UseCase) auth.Handlers {
 // @Produce json
 // @Param user body AuthRequest true "user credentials"
 // @Success 201 {object} models.UserWithToken
+// @Failure 400 {string} string "Provided credentials don't match requirements"
+// @Failure 409 {string} string "User with such username already exists"
 // @Router /register [post]
-func (h *authHandlers) Register() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (h *authHandlers) Register() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
 		var req AuthRequest
 
 		if err := utils.StructScan(r, &req); err != nil {
-			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
-			return
+			return httper.NewStatusError(http.StatusBadRequest, err.Error())
+		}
+
+		err := utils.ValidateStruct(&req)
+		if err != nil {
+			return httper.ParseValidatorError(err)
 		}
 
 		user, err := h.authUC.Register(&models.User{
@@ -49,12 +56,14 @@ func (h *authHandlers) Register() http.HandlerFunc {
 		})
 
 		if err != nil {
-			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
-			return
+			return err
 		}
 
 		utils.RespondWithJSON(w, http.StatusCreated, user)
+		return nil
 	}
+
+	return httper.HandlerWithError(fn)
 }
 
 // Login godoc
@@ -65,14 +74,15 @@ func (h *authHandlers) Register() http.HandlerFunc {
 // @Produce json
 // @Param creds body AuthRequest true "user credentials"
 // @Success 200 {object} models.UserWithToken
+// @Failure 400 {string} string "User with such username is not found"
+// @Failure 400 {string} string "Provided password is wrong"
 // @Router /login [post]
-func (h *authHandlers) Login() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func (h *authHandlers) Login() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
 		var req AuthRequest
 
 		if err := utils.StructScan(r, &req); err != nil {
-			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
-			return
+			return httper.NewStatusError(http.StatusBadRequest, err.Error())
 		}
 
 		user, err := h.authUC.Login(&models.User{
@@ -80,11 +90,12 @@ func (h *authHandlers) Login() http.HandlerFunc {
 			Password: req.Password,
 		})
 		if err != nil {
-			utils.RespondWithError(w, http.StatusBadRequest, err.Error())
-			return
+			return err
 		}
 
 		utils.RespondWithJSON(w, http.StatusOK, user)
-
+		return nil
 	}
+
+	return httper.HandlerWithError(fn)
 }
