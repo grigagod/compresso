@@ -18,7 +18,7 @@ var (
 var enc png.Encoder
 
 // ConvertImage convert image with specified quality(compression) ratio.
-func ConvertImage(reader io.Reader, currentFormat Format, ratio int) (io.Reader, error) {
+func ProcessImage(reader io.Reader, currentFormat Format, ratio int) (io.Reader, error) {
 	switch currentFormat {
 	case PNG:
 		source, err := png.Decode(reader)
