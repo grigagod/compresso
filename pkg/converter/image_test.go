@@ -21,11 +21,10 @@ func TestConvertImage(t *testing.T) {
 
 		reader := bufio.NewReader(file)
 
-		_, err = ProcessImage(reader, JPG, 75)
+		_, err = ProcessImage(reader, NewImageOpts(JPG, PNG, 75))
 		if err != nil {
 			log.Fatal(err)
 		}
-
 	})
 	t.Run("PngToJpg", func(t *testing.T) {
 		file, err := os.Open("./testdata/test.png")
@@ -40,11 +39,9 @@ func TestConvertImage(t *testing.T) {
 
 		reader := bufio.NewReader(file)
 
-		_, err = ProcessImage(reader, PNG, 75)
+		_, err = ProcessImage(reader, NewImageOpts(PNG, JPG, 75))
 		if err != nil {
 			log.Fatal(err)
 		}
-
 	})
-
 }

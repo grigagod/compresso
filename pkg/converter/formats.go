@@ -1,8 +1,8 @@
 package converter
 
-type Format string
+type ImageFormat string
 
 const (
-	PNG Format = "png"
-	JPG Format = "jpg"
+	PNG ImageFormat = "png"
+	JPG ImageFormat = "jpg"
 )

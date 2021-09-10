@@ -3,32 +3,34 @@ package converter
 import (
 	"bytes"
 	"errors"
+	"image"
 	"image/jpeg"
 	"image/png"
 	"io"
 )
 
 var (
-	ErrDecodeImage = errors.New("can't decode image")
-	ErrEncodeImage = errors.New("can't encode image")
-	ErrImageFormat = errors.New("unsupported image format")
+	ErrDecodeImage    = errors.New("can't decode image")
+	ErrEncodeImage    = errors.New("can't encode image")
+	ErrImageFormat    = errors.New("unsupported image format")
+	ErrImageConvesion = errors.New("unsupported image conversion")
 )
 
 // Global encoder to reuse buffer pool
 var enc png.Encoder
 
-// ConvertImage convert image with specified quality(compression) ratio.
-func ProcessImage(reader io.Reader, currentFormat Format, ratio int) (io.Reader, error) {
-	switch currentFormat {
-	case PNG:
-		source, err := png.Decode(reader)
-		if err != nil {
-			return nil, ErrDecodeImage
-		}
+// ProcessImage process image with specified options.
+func ProcessImage(input io.Reader, opts ImageOpts) (io.Reader, error) {
+	img, err := DecodeImage(input, opts.CurrentFormat)
+	if err != nil {
+		return nil, err
+	}
 
+	switch opts.CurrentFormat {
+	case PNG:
 		buf := new(bytes.Buffer)
-		err = jpeg.Encode(buf, source, &jpeg.Options{
-			Quality: ratio,
+		err = jpeg.Encode(buf, img, &jpeg.Options{
+			Quality: opts.CompressionRatio,
 		})
 		if err != nil {
 			return nil, ErrEncodeImage
@@ -36,19 +38,35 @@ func ProcessImage(reader io.Reader, currentFormat Format, ratio int) (io.Reader,
 
 		return bytes.NewReader(buf.Bytes()), nil
 	case JPG:
-		source, err := jpeg.Decode(reader)
-		if err != nil {
-			return nil, ErrDecodeImage
-		}
-
 		buf := new(bytes.Buffer)
-		enc.CompressionLevel = ratioToCompression(ratio)
-		err = enc.Encode(buf, source)
+		enc.CompressionLevel = ratioToCompression(opts.CompressionRatio)
+
+		err = enc.Encode(buf, img)
 		if err != nil {
 			return nil, ErrEncodeImage
 		}
 
 		return bytes.NewReader(buf.Bytes()), nil
+	default:
+		return nil, ErrImageFormat
+	}
+}
+
+// DecodeImage decode image of supported formats.
+func DecodeImage(input io.Reader, current ImageFormat) (image.Image, error) {
+	switch current {
+	case PNG:
+		img, err := png.Decode(input)
+		if err != nil {
+			return nil, ErrDecodeImage
+		}
+		return img, err
+	case JPG:
+		img, err := jpeg.Decode(input)
+		if err != nil {
+			return nil, ErrDecodeImage
+		}
+		return img, nil
 	default:
 		return nil, ErrImageFormat
 	}
