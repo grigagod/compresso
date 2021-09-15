@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestConvertImage(t *testing.T) {
+func TestProcessImage(t *testing.T) {
 	t.Run("JpgToPng", func(t *testing.T) {
 		file, err := os.Open("./testdata/test.jpg")
 		if err != nil {

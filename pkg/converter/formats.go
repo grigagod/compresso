@@ -1,5 +1,7 @@
 package converter
 
+// Media formats supported by pkg definitions
+
 type imageFormat string
 
 const (
