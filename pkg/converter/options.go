@@ -13,3 +13,18 @@ func NewImageOpts(current, target ImageFormat, ratio int) ImageOpts {
 		CompressionRatio: ratio,
 	}
 }
+
+type VideoOpts struct {
+	CurrentFormat VideoFormat
+	TargetFormat  VideoFormat
+	CRF           int
+}
+
+func NewVideoOpts(current, target VideoFormat, crf int) VideoOpts {
+	return VideoOpts{
+
+		CurrentFormat: current,
+		TargetFormat:  target,
+		CRF:           crf,
+	}
+}
