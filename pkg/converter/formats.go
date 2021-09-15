@@ -1,22 +1,22 @@
 package converter
 
-type ImageFormat string
+type imageFormat string
 
 const (
-	PNG ImageFormat = "png"
-	JPG ImageFormat = "jpg"
+	PNG imageFormat = "png"
+	JPG imageFormat = "jpg"
 )
 
-type VideoFormat string
+type videoFormat string
 
 const (
-	MKV  VideoFormat = "matroska"
-	WebM VideoFormat = "webm"
+	MKV  videoFormat = "matroska"
+	WebM videoFormat = "webm"
 )
 
-type AudioFormat string
+type audioFormat string
 
 const (
-	MP3 AudioFormat = "mp3"
-	WAV AudioFormat = "wav"
+	MP3 audioFormat = "mp3"
+	WAV audioFormat = "wav"
 )

@@ -42,8 +42,8 @@ func TestProcessVideo(t *testing.T) {
 
 		reader := bufio.NewReader(file)
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-		err = ProcessVideo(ctx, reader, ioutil.Discard, MKV, 17)
 		defer cancel()
+		err = ProcessVideo(ctx, reader, ioutil.Discard, MKV, 17)
 		if ctx.Err() != context.DeadlineExceeded {
 			log.Print(err)
 			log.Fatal(ctx.Err())

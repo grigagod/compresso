@@ -1,7 +1,6 @@
 package converter
 
 import (
-	"bytes"
 	"errors"
 	"image"
 	"image/jpeg"
@@ -19,50 +18,48 @@ var (
 // Global encoder to reuse buffer pool
 var enc png.Encoder
 
-// ProcessImage process image with specified options.
-func ProcessImage(src io.Reader, dst io.Writer, currentFormat ImageFormat, ratio int) (io.Reader, error) {
+// ProcessImage process image from source with given options.
+func ProcessImage(src io.Reader, dst io.Writer, currentFormat imageFormat, ratio int) error {
 	img, err := DecodeImage(src, currentFormat)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	switch currentFormat {
 	case PNG:
-		buf := new(bytes.Buffer)
-		err = jpeg.Encode(buf, img, &jpeg.Options{
+		err = jpeg.Encode(dst, img, &jpeg.Options{
 			Quality: ratio,
 		})
 		if err != nil {
-			return nil, ErrEncodeImage
+			return ErrEncodeImage
 		}
 
-		return bytes.NewReader(buf.Bytes()), nil
+		return nil
 	case JPG:
-		buf := new(bytes.Buffer)
 		enc.CompressionLevel = ratioToCompression(ratio)
 
-		err = enc.Encode(buf, img)
+		err = enc.Encode(dst, img)
 		if err != nil {
-			return nil, ErrEncodeImage
+			return ErrEncodeImage
 		}
 
-		return bytes.NewReader(buf.Bytes()), nil
+		return nil
 	default:
-		return nil, ErrImageFormat
+		return ErrImageFormat
 	}
 }
 
 // DecodeImage decode image of supported formats.
-func DecodeImage(input io.Reader, current ImageFormat) (image.Image, error) {
+func DecodeImage(src io.Reader, current imageFormat) (image.Image, error) {
 	switch current {
 	case PNG:
-		img, err := png.Decode(input)
+		img, err := png.Decode(src)
 		if err != nil {
 			return nil, ErrDecodeImage
 		}
 		return img, err
 	case JPG:
-		img, err := jpeg.Decode(input)
+		img, err := jpeg.Decode(src)
 		if err != nil {
 			return nil, ErrDecodeImage
 		}

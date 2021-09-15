@@ -9,12 +9,11 @@ import (
 )
 
 var (
-	ErrVideoCRF           = errors.New("CRF value is out of range")
-	ErrProcessInterrupted = errors.New("process interrupted")
+	ErrVideoCRF = errors.New("CRF value is out of range")
 )
 
 // ProcessVideo process video from source with given options.
-func ProcessVideo(ctx context.Context, src io.Reader, dst io.Writer, targetFormat VideoFormat, crf int) error {
+func ProcessVideo(ctx context.Context, src io.Reader, dst io.Writer, targetFormat videoFormat, crf int) error {
 	if crf > 51 || crf < 0 {
 		return ErrVideoCRF
 	}

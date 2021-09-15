@@ -22,7 +22,7 @@ func TestConvertImage(t *testing.T) {
 
 		reader := bufio.NewReader(file)
 
-		_, err = ProcessImage(reader, ioutil.Discard, JPG, 75)
+		err = ProcessImage(reader, ioutil.Discard, JPG, 75)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -40,7 +40,7 @@ func TestConvertImage(t *testing.T) {
 
 		reader := bufio.NewReader(file)
 
-		_, err = ProcessImage(reader, ioutil.Discard, PNG, 75)
+		err = ProcessImage(reader, ioutil.Discard, PNG, 75)
 		if err != nil {
 			log.Fatal(err)
 		}
