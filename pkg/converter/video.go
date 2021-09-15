@@ -14,15 +14,15 @@ var (
 )
 
 // ProcessVideo process video from source with given options.
-func ProcessVideo(ctx context.Context, src io.Reader, dst io.Writer, opts VideoOpts) error {
-	if opts.CRF > 51 || opts.CRF < 0 {
+func ProcessVideo(ctx context.Context, src io.Reader, dst io.Writer, targetFormat VideoFormat, crf int) error {
+	if crf > 51 || crf < 0 {
 		return ErrVideoCRF
 	}
 
 	cmd := fluentffmpeg.NewCommand("").
 		PipeInput(src).
-		ConstantRateFactor(opts.CRF).
-		OutputFormat(string(opts.TargetFormat))
+		ConstantRateFactor(crf).
+		OutputFormat(string(targetFormat))
 
 	err := cmd.PipeOutput(dst).RunWithContext(ctx)
 	return err

@@ -20,17 +20,17 @@ var (
 var enc png.Encoder
 
 // ProcessImage process image with specified options.
-func ProcessImage(input io.Reader, opts ImageOpts) (io.Reader, error) {
-	img, err := DecodeImage(input, opts.CurrentFormat)
+func ProcessImage(src io.Reader, dst io.Writer, currentFormat ImageFormat, ratio int) (io.Reader, error) {
+	img, err := DecodeImage(src, currentFormat)
 	if err != nil {
 		return nil, err
 	}
 
-	switch opts.CurrentFormat {
+	switch currentFormat {
 	case PNG:
 		buf := new(bytes.Buffer)
 		err = jpeg.Encode(buf, img, &jpeg.Options{
-			Quality: opts.CompressionRatio,
+			Quality: ratio,
 		})
 		if err != nil {
 			return nil, ErrEncodeImage
@@ -39,7 +39,7 @@ func ProcessImage(input io.Reader, opts ImageOpts) (io.Reader, error) {
 		return bytes.NewReader(buf.Bytes()), nil
 	case JPG:
 		buf := new(bytes.Buffer)
-		enc.CompressionLevel = ratioToCompression(opts.CompressionRatio)
+		enc.CompressionLevel = ratioToCompression(ratio)
 
 		err = enc.Encode(buf, img)
 		if err != nil {

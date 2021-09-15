@@ -13,3 +13,10 @@ const (
 	MKV  VideoFormat = "matroska"
 	WebM VideoFormat = "webm"
 )
+
+type AudioFormat string
+
+const (
+	MP3 AudioFormat = "mp3"
+	WAV AudioFormat = "wav"
+)
