@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	models "github.com/grigagod/compresso/internal/models"
+	auth "github.com/grigagod/compresso/internal/auth"
 )
 
 // MockRepository is a mock of Repository interface.
@@ -35,10 +35,10 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 }
 
 // Create mocks base method.
-func (m *MockRepository) Create(user *models.User) (*models.User, error) {
+func (m *MockRepository) Create(user *auth.User) (*auth.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", user)
-	ret0, _ := ret[0].(*models.User)
+	ret0, _ := ret[0].(*auth.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,10 +50,10 @@ func (mr *MockRepositoryMockRecorder) Create(user interface{}) *gomock.Call {
 }
 
 // FindByName mocks base method.
-func (m *MockRepository) FindByName(username string) (*models.User, error) {
+func (m *MockRepository) FindByName(username string) (*auth.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByName", username)
-	ret0, _ := ret[0].(*models.User)
+	ret0, _ := ret[0].(*auth.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

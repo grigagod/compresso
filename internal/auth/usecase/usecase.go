@@ -4,7 +4,6 @@ import (
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/httper"
-	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/pkg/utils"
 )
 
@@ -17,7 +16,7 @@ func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) *authUseCase {
 	return &authUseCase{cfg: cfg, authRepo: authRepo}
 }
 
-func (u *authUseCase) Register(user *models.User) (*models.UserWithToken, error) {
+func (u *authUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
 	existsUser, err := u.authRepo.FindByName(user.Username)
 	if existsUser != nil || err == nil {
 		return nil, httper.NewBadRequestMsg(httper.UserExistsMsg)
@@ -39,13 +38,13 @@ func (u *authUseCase) Register(user *models.User) (*models.UserWithToken, error)
 		return nil, err
 	}
 
-	return &models.UserWithToken{
+	return &auth.UserWithToken{
 		User:  createdUser,
 		Token: token,
 	}, nil
 }
 
-func (u *authUseCase) Login(user *models.User) (*models.UserWithToken, error) {
+func (u *authUseCase) Login(user *auth.User) (*auth.UserWithToken, error) {
 	foundUser, err := u.authRepo.FindByName(user.Username)
 	if err != nil {
 		return nil, httper.ParseSqlError(err)
@@ -62,7 +61,7 @@ func (u *authUseCase) Login(user *models.User) (*models.UserWithToken, error) {
 		return nil, err
 	}
 
-	return &models.UserWithToken{
+	return &auth.UserWithToken{
 		User:  foundUser,
 		Token: token,
 	}, nil

@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/auth/mock"
 	"github.com/grigagod/compresso/internal/auth/usecase"
-	"github.com/grigagod/compresso/internal/models"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -24,7 +24,7 @@ func TestAuthUseCase_Register(t *testing.T) {
 	mockAuthRepo := mock.NewMockRepository(ctrl)
 	authUC := usecase.NewAuthUseCase(&cfg, mockAuthRepo)
 
-	user := &models.User{
+	user := &auth.User{
 		Username: "aa",
 		Password: "asd",
 	}
@@ -60,7 +60,7 @@ func TestAuthUseCase_Login(t *testing.T) {
 	mockAuthRepo := mock.NewMockRepository(ctrl)
 	authUC := usecase.NewAuthUseCase(&cfg, mockAuthRepo)
 
-	user := &models.User{
+	user := &auth.User{
 		Username: "aa",
 		Password: "asd",
 	}
@@ -68,7 +68,7 @@ func TestAuthUseCase_Login(t *testing.T) {
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	require.NoError(t, err)
 
-	mockUser := &models.User{
+	mockUser := &auth.User{
 		Username: "aa",
 		Password: string(hashPassword),
 	}

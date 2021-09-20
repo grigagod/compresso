@@ -8,7 +8,6 @@ import (
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/httper"
-	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/pkg/utils"
 )
 
@@ -48,7 +47,7 @@ func (h *authHandlers) Register() http.Handler {
 			return httper.ParseValidatorError(err)
 		}
 
-		user, err := h.authUC.Register(&models.User{
+		user, err := h.authUC.Register(&auth.User{
 			ID:        uuid.New(),
 			Username:  req.Username,
 			Password:  req.Password,
@@ -85,7 +84,7 @@ func (h *authHandlers) Login() http.Handler {
 			return httper.NewStatusError(http.StatusBadRequest, err.Error())
 		}
 
-		user, err := h.authUC.Login(&models.User{
+		user, err := h.authUC.Login(&auth.User{
 			Username: req.Username,
 			Password: req.Password,
 		})

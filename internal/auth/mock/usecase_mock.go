@@ -8,7 +8,7 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	models "github.com/grigagod/compresso/internal/models"
+	auth "github.com/grigagod/compresso/internal/auth"
 )
 
 // MockUseCase is a mock of UseCase interface.
@@ -35,10 +35,10 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // Login mocks base method.
-func (m *MockUseCase) Login(user *models.User) (*models.UserWithToken, error) {
+func (m *MockUseCase) Login(user *auth.User) (*auth.UserWithToken, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Login", user)
-	ret0, _ := ret[0].(*models.UserWithToken)
+	ret0, _ := ret[0].(*auth.UserWithToken)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -50,10 +50,10 @@ func (mr *MockUseCaseMockRecorder) Login(user interface{}) *gomock.Call {
 }
 
 // Register mocks base method.
-func (m *MockUseCase) Register(user *models.User) (*models.UserWithToken, error) {
+func (m *MockUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Register", user)
-	ret0, _ := ret[0].(*models.UserWithToken)
+	ret0, _ := ret[0].(*auth.UserWithToken)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/uuid"
-	"github.com/grigagod/compresso/internal/models"
+	"github.com/grigagod/compresso/internal/auth"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
 )
@@ -24,7 +24,7 @@ func TestAuthRepo_Create(t *testing.T) {
 	authRepo := NewAuthRepository(sqlxDB)
 
 	t.Run("Create", func(t *testing.T) {
-		user := &models.User{
+		user := &auth.User{
 			ID:        uuid.New(),
 			Username:  "test",
 			Password:  "test",
@@ -60,7 +60,7 @@ func TestAuthRepo_FindByName(t *testing.T) {
 	authRepo := NewAuthRepository(sqlxDB)
 
 	t.Run("FindByName", func(t *testing.T) {
-		user := &models.User{
+		user := &auth.User{
 			ID:        uuid.New(),
 			Username:  "test",
 			Password:  "test",
