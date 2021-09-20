@@ -13,7 +13,7 @@ type authUseCase struct {
 	authRepo auth.Repository
 }
 
-func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) auth.UseCase {
+func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) *authUseCase {
 	return &authUseCase{cfg: cfg, authRepo: authRepo}
 }
 

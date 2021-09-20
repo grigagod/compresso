@@ -1,7 +1,6 @@
 package repo
 
 import (
-	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
@@ -11,7 +10,7 @@ type authRepo struct {
 	db *sqlx.DB
 }
 
-func NewAuthRepository(db *sqlx.DB) auth.Repository {
+func NewAuthRepository(db *sqlx.DB) *authRepo {
 	return &authRepo{db}
 }
 
