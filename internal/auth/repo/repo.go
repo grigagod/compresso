@@ -16,18 +16,20 @@ func NewAuthRepository(db *sqlx.DB) auth.Repository {
 }
 
 func (r *authRepo) Create(user *models.User) (*models.User, error) {
+	query := `INSERT INTO svc.users(user_id, username, password, created_at) VALUES($1, $2, $3, $4) RETURNING *`
 	u := &models.User{}
 
-	if err := r.db.QueryRowx(createUserQuery, &user.ID, &user.Username, &user.Password, &user.CreatedAt).StructScan(u); err != nil {
+	if err := r.db.QueryRowx(query, &user.ID, &user.Username, &user.Password, &user.CreatedAt).StructScan(u); err != nil {
 		return nil, errors.Wrap(err, "authRepo.Create.StructScan")
 	}
 	return u, nil
 }
 
 func (r *authRepo) FindByName(username string) (*models.User, error) {
+	query := `SELECT * FROM svc.users WHERE username = $1`
 	u := &models.User{}
 
-	if err := r.db.QueryRowx(findUserByNameQuery, username).StructScan(u); err != nil {
+	if err := r.db.QueryRowx(query, username).StructScan(u); err != nil {
 		return nil, errors.Wrap(err, "authRepo.FindByName.StructScan")
 	}
 

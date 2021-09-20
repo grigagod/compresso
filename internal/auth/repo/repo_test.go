@@ -34,7 +34,8 @@ func TestAuthRepo_Create(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"user_id", "username", "password", "created_at"}).AddRow(
 			&user.ID, "test", "test", &user.CreatedAt)
 
-		mock.ExpectQuery(createUserQuery).
+		query := `INSERT INTO svc.users(user_id, username, password, created_at) VALUES($1, $2, $3, $4) RETURNING *`
+		mock.ExpectQuery(query).
 			WithArgs(&user.ID, &user.Username, &user.Password, &user.CreatedAt).
 			WillReturnRows(rows)
 
@@ -69,7 +70,8 @@ func TestAuthRepo_FindByName(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"user_id", "username", "password", "created_at"}).AddRow(
 			&user.ID, "test", "test", &user.CreatedAt)
 
-		mock.ExpectQuery(findUserByNameQuery).WithArgs(user.Username).WillReturnRows(rows)
+		query := `SELECT * FROM svc.users WHERE username = $1`
+		mock.ExpectQuery(query).WithArgs(user.Username).WillReturnRows(rows)
 
 		foundUser, err := authRepo.FindByName(user.Username)
 
