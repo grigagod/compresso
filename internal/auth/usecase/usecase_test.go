@@ -19,7 +19,7 @@ func TestAuthUseCase_Register(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	cfg := config.Config{}
+	cfg := config.Auth{}
 
 	mockAuthRepo := mock.NewMockRepository(ctrl)
 	authUC := usecase.NewAuthUseCase(&cfg, mockAuthRepo)
@@ -55,7 +55,7 @@ func TestAuthUseCase_Login(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	cfg := config.Config{}
+	cfg := config.Auth{}
 
 	mockAuthRepo := mock.NewMockRepository(ctrl)
 	authUC := usecase.NewAuthUseCase(&cfg, mockAuthRepo)

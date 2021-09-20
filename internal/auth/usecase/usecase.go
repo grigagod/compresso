@@ -9,11 +9,11 @@ import (
 )
 
 type authUseCase struct {
-	cfg      *config.Config
+	cfg      *config.Auth
 	authRepo auth.Repository
 }
 
-func NewAuthUseCase(cfg *config.Config, authRepo auth.Repository) auth.UseCase {
+func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) auth.UseCase {
 	return &authUseCase{cfg: cfg, authRepo: authRepo}
 }
 

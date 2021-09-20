@@ -11,15 +11,15 @@ import (
 )
 
 type AuthServer struct {
-	authCfg *config.Config
+	authCfg *config.Auth
 	*server.Server
 }
 
-func NewAuthServer(authCfg *config.Config, db *sqlx.DB) *AuthServer {
+func NewAuthServer(cfg *config.Config, db *sqlx.DB) *AuthServer {
 	return &AuthServer{
-		authCfg: authCfg,
+		authCfg: &cfg.Auth,
 		Server: &server.Server{
-			Cfg:    authCfg.Server,
+			Cfg:    cfg.Server,
 			Db:     db,
 			Router: mux.NewRouter(),
 			Logger: log.Default(),

@@ -13,11 +13,11 @@ import (
 )
 
 type authHandlers struct {
-	cfg    *config.Config
+	cfg    *config.Auth
 	authUC auth.UseCase
 }
 
-func NewAuthHandlers(cfg *config.Config, authUC auth.UseCase) auth.Handlers {
+func NewAuthHandlers(cfg *config.Auth, authUC auth.UseCase) auth.Handlers {
 	return &authHandlers{
 		cfg:    cfg,
 		authUC: authUC,
