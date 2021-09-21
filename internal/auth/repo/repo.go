@@ -6,15 +6,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-type authRepo struct {
+type AuthRepo struct {
 	db *sqlx.DB
 }
 
-func NewAuthRepository(db *sqlx.DB) *authRepo {
-	return &authRepo{db}
+func NewAuthRepository(db *sqlx.DB) *AuthRepo {
+	return &AuthRepo{db}
 }
 
-func (r *authRepo) Create(user *auth.User) (*auth.User, error) {
+func (r *AuthRepo) Create(user *auth.User) (*auth.User, error) {
 	query := `INSERT INTO svc.users(user_id, username, password, created_at) VALUES($1, $2, $3, $4) RETURNING *`
 	u := &auth.User{}
 
@@ -24,7 +24,7 @@ func (r *authRepo) Create(user *auth.User) (*auth.User, error) {
 	return u, nil
 }
 
-func (r *authRepo) FindByName(username string) (*auth.User, error) {
+func (r *AuthRepo) FindByName(username string) (*auth.User, error) {
 	query := `SELECT * FROM svc.users WHERE username = $1`
 	u := &auth.User{}
 

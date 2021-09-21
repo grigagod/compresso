@@ -7,16 +7,16 @@ import (
 	"github.com/grigagod/compresso/pkg/utils"
 )
 
-type authUseCase struct {
+type AuthUseCase struct {
 	cfg      *config.Auth
 	authRepo auth.Repository
 }
 
-func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) *authUseCase {
-	return &authUseCase{cfg: cfg, authRepo: authRepo}
+func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) *AuthUseCase {
+	return &AuthUseCase{cfg: cfg, authRepo: authRepo}
 }
 
-func (u *authUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
+func (u *AuthUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
 	existsUser, err := u.authRepo.FindByName(user.Username)
 	if existsUser != nil || err == nil {
 		return nil, httper.NewBadRequestMsg(httper.UserExistsMsg)
@@ -44,7 +44,7 @@ func (u *authUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
 	}, nil
 }
 
-func (u *authUseCase) Login(user *auth.User) (*auth.UserWithToken, error) {
+func (u *AuthUseCase) Login(user *auth.User) (*auth.UserWithToken, error) {
 	foundUser, err := u.authRepo.FindByName(user.Username)
 	if err != nil {
 		return nil, httper.ParseSqlError(err)
