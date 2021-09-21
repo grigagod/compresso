@@ -1,4 +1,4 @@
-package utils
+package config
 
 import (
 	"errors"
@@ -7,8 +7,18 @@ import (
 	"github.com/spf13/viper"
 )
 
-// LoadConfig loads config file from given path.
-func LoadConfig(filepath string) (*viper.Viper, error) {
+// LoadConfig loads config into dst from given path.
+func LoadConfig(dst interface{}, filepath string) error {
+	v, err := PreloadConfig(filepath)
+	if err != nil {
+		return err
+	}
+
+	err = v.Unmarshal(dst)
+	return err
+}
+
+func PreloadConfig(filepath string) (*viper.Viper, error) {
 	v := viper.New()
 
 	v.SetConfigName(filepath)
@@ -27,8 +37,8 @@ func LoadConfig(filepath string) (*viper.Viper, error) {
 // GetConfigPath returns config path for local or docker environment.
 func GetConfigPath(serviceName, configEnv string) string {
 	if configEnv == "docker" {
-		return fmt.Sprintf("./config/%s/config-docker", serviceName)
+		return fmt.Sprintf("./configs/%s/config-docker", serviceName)
 	}
 
-	return fmt.Sprintf("./config/%s/config-local", serviceName)
+	return fmt.Sprintf("./configs/%s/config-local", serviceName)
 }

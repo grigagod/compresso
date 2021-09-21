@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/grigagod/compresso/internal/auth/config"
+	authCfg "github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/auth/server"
+	"github.com/grigagod/compresso/internal/config"
 	"github.com/grigagod/compresso/pkg/db/postgres"
-	"github.com/grigagod/compresso/pkg/utils"
 
 	_ "github.com/grigagod/compresso/docs/auth" // load API Docs files (Swagger)
 )
@@ -21,19 +21,20 @@ import (
 func main() {
 	log.Println("Starting auth server")
 
-	authCfg, err := config.LoadConfig(utils.GetConfigPath("auth", os.Getenv("config-auth")))
+	var cfg authCfg.Config
+	err := config.LoadConfig(&cfg, config.GetConfigPath("auth", os.Getenv("config-auth")))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	db, err := postgres.NewPsqlDB(authCfg.DB.Host, authCfg.DB.Port, authCfg.DB.User,
-		authCfg.DB.DbName, authCfg.DB.Password, authCfg.DB.Driver)
+	db, err := postgres.NewPsqlDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
+		cfg.DB.DbName, cfg.DB.Password, cfg.DB.Driver)
 	if err != nil {
 		log.Fatal("Postgres connection failed:", err)
 	}
 	defer db.Close()
 
-	s := server.NewAuthServer(authCfg, db)
+	s := server.NewAuthServer(&cfg, db)
 
 	s.Run()
 }
