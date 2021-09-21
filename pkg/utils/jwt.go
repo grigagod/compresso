@@ -42,7 +42,10 @@ func GenerateJWTToken(id uuid.UUID, expires time.Duration, JwtSecretKey string) 
 // ExtractJWTFromRequest extracts JWT claims form request.
 func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*Claims, error) {
 	// Get the JWT string
-	tokenString := ExtractBearerToken(r)
+	tokenString, err := ExtractBearerToken(r)
+	if err != nil {
+		return nil, err
+	}
 
 	// Parse the JWT string
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
@@ -69,8 +72,12 @@ func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*Claims, error
 }
 
 // ExtractBearerToken extracts bearer token from request Authorization header.
-func ExtractBearerToken(r *http.Request) string {
+func ExtractBearerToken(r *http.Request) (string, error) {
 	headerAuthorization := r.Header.Get("Authorization")
 	bearerToken := strings.Split(headerAuthorization, " ")
-	return html.EscapeString(bearerToken[1])
+	if len(bearerToken) != 2 {
+		return "", errors.New("invalid header format")
+	}
+
+	return html.EscapeString(bearerToken[1]), nil
 }
