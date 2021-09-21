@@ -16,7 +16,7 @@ var (
 )
 
 // Global encoder to reuse buffer pool
-var enc png.Encoder
+var pngEnc png.Encoder
 
 // ProcessImage process image from source with given options.
 func ProcessImage(src io.Reader, dst io.Writer, currentFormat imageFormat, ratio int) error {
@@ -36,9 +36,9 @@ func ProcessImage(src io.Reader, dst io.Writer, currentFormat imageFormat, ratio
 
 		return nil
 	case JPG:
-		enc.CompressionLevel = ratioToCompression(ratio)
+		pngEnc.CompressionLevel = ratioToCompression(ratio)
 
-		err = enc.Encode(dst, img)
+		err = pngEnc.Encode(dst, img)
 		if err != nil {
 			return ErrEncodeImage
 		}
@@ -73,9 +73,9 @@ func ratioToCompression(ratio int) png.CompressionLevel {
 	switch {
 	case ratio < 25:
 		return png.BestCompression
-	case ratio > 24 && ratio < 50:
+	case ratio >= 25 && ratio < 50:
 		return png.DefaultCompression
-	case ratio > 49 && ratio < 75:
+	case ratio >= 50 && ratio < 75:
 		return png.BestSpeed
 	default:
 		return png.NoCompression
