@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  postgresql:
+    image: postgres:12-alpine
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - ${HOME}/pgdata/:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=121073
+      - POSTGRES_DB=compresso
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5 
+      start_period: 1s
+    networks:
+      - web_api
+  
+  migrate:
+    image: migrate/migrate
+    volumes: 
+      - ./migrations:/migrations
+    command: ["-path", "/migrations", "-database",  "postgres://postgres:121073@postgresql:5432/compresso?sslmode=disable", "up", "1"]
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    networks:
+      - web_api
+
+networks:
+  web_api:
+    driver: bridge
