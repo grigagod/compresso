@@ -1,14 +1,13 @@
 package httpserver
 
 import (
-	"net/http/pprof"
-
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func MapPprofHandler(router *chi.Mux) {
-	router.HandleFunc("/pprof/", pprof.Index)
+	router.Mount("/debug", middleware.Profiler())
 }
 
 func MapSwaggerHandler(router *chi.Mux, url string) {
