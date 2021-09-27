@@ -14,5 +14,4 @@ func (s *AuthServer) MapHandlers() {
 	aHandlers := authHttp.NewAuthHandlers(s.authCfg, aUseCase)
 
 	authHttp.MapAuthRoutes(s.Router, aHandlers)
-
 }
