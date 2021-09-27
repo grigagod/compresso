@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"github.com/jackc/pgx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -15,14 +14,20 @@ type Logger interface {
 	Errorw(msg string, keyValues ...interface{})
 	Panicw(msg string, keyValues ...interface{})
 	Fatalw(msg string, keyValues ...interface{})
-}
 
-type LogLevel = pgx.LogLevel
+	Debugf(template string, args ...interface{})
+	Infof(template string, args ...interface{})
+	Warnf(template string, args ...interface{})
+	Errorf(template string, args ...interface{})
+	Panicf(template string, args ...interface{})
+	Fatalf(template string, args ...interface{})
+}
 
 type WrappedLogger struct {
 	*zap.SugaredLogger
 }
 
+// GetLoggerConfig returns example of configuration
 func GetLoggerConfig() zap.Config {
 	cfg := zap.NewProductionConfig()
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
