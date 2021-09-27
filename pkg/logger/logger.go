@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"context"
-
 	"github.com/jackc/pgx"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -11,7 +9,6 @@ import (
 const skipCallers = 1
 
 type Logger interface {
-	pgx.Logger
 	Debugw(msg string, keyValues ...interface{})
 	Infow(msg string, keyValues ...interface{})
 	Warnw(msg string, keyValues ...interface{})
@@ -40,30 +37,4 @@ func NewWrappedLogger(cfg zap.Config, args ...interface{}) (*WrappedLogger, erro
 
 	sl := l.Sugar().With(args...)
 	return &WrappedLogger{sl}, nil
-}
-
-func (wl *WrappedLogger) Log(ctx context.Context, level pgx.LogLevel, msg string, data map[string]interface{}) {
-	fields := make([]zapcore.Field, len(data))
-	i := 0
-	for k, v := range data {
-		fields[i] = zap.Any(k, v)
-		i++
-	}
-
-	logger := wl.SugaredLogger.Desugar()
-
-	switch level {
-	case pgx.LogLevelTrace:
-		logger.Debug(msg, append(fields, zap.Stringer("PGX_LOG_LEVEL", level))...)
-	case pgx.LogLevelDebug:
-		logger.Debug(msg, fields...)
-	case pgx.LogLevelInfo:
-		logger.Info(msg, fields...)
-	case pgx.LogLevelWarn:
-		logger.Warn(msg, fields...)
-	case pgx.LogLevelError:
-		logger.Error(msg, fields...)
-	default:
-		logger.Error(msg, append(fields, zap.Stringer("PGX_LOG_LEVEL", level))...)
-	}
 }
