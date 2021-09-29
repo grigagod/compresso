@@ -1,33 +1,31 @@
 package server
 
 import (
-	"log"
 	_ "net/http/pprof"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi/v5"
 	"github.com/grigagod/compresso/internal/auth/config"
-	"github.com/grigagod/compresso/internal/server"
+	"github.com/grigagod/compresso/internal/httpserver"
+	"github.com/grigagod/compresso/pkg/logger"
 	"github.com/jmoiron/sqlx"
 )
 
 type AuthServer struct {
 	authCfg *config.Auth
-	*server.Server
+	Router  *chi.Mux
+	Db      *sqlx.DB
+	Log     logger.Logger
 }
 
-func NewAuthServer(cfg *config.Config, db *sqlx.DB) *AuthServer {
+func NewAuthServer(cfg *config.Auth, db *sqlx.DB, log logger.Logger) *AuthServer {
 	return &AuthServer{
-		authCfg: &cfg.Auth,
-		Server: &server.Server{
-			Cfg:    cfg.Server,
-			Db:     db,
-			Router: mux.NewRouter(),
-			Logger: log.Default(),
-		},
+		authCfg: cfg,
+		Router:  chi.NewMux(),
+		Db:      db,
+		Log:     log,
 	}
 }
 
-func (s *AuthServer) Run() {
-	s.MapHandlers()
-	s.Server.Start()
+func (s *AuthServer) ListenAndServe(cfg *httpserver.Config) {
+	httpserver.ListenAndServe(cfg, s.Router, s.Log)
 }
