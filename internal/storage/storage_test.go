@@ -39,6 +39,7 @@ func TestAWSStorage_BasicOperations(t *testing.T) {
 
 	t.Run("GetObject", func(t *testing.T) {
 		resp, err := storage.GetObject(context.Background(), "test_basic.txt")
+		defer resp.Close()
 		assert.NoError(t, err)
 
 		body, err := ioutil.ReadAll(resp)

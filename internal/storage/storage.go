@@ -1,10 +1,8 @@
 package storage
 
 import (
-	"bytes"
 	"context"
 	"io"
-	"io/ioutil"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
@@ -47,8 +45,8 @@ func (s *AWSStorage) PutObject(ctx context.Context, input UploadInput) error {
 	return nil
 }
 
-// GetObject download given file from the bucket.
-func (s *AWSStorage) GetObject(ctx context.Context, fileName string) (io.ReadSeeker, error) {
+// GetObject return io.ReadCloser for given file from the bucket.
+func (s *AWSStorage) GetObject(ctx context.Context, fileName string) (io.ReadCloser, error) {
 	resp, err := s.client.GetObjectWithContext(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(s.cfg.Bucket),
 		Key:    aws.String(fileName),
@@ -57,12 +55,7 @@ func (s *AWSStorage) GetObject(ctx context.Context, fileName string) (io.ReadSee
 		return nil, errors.Wrap(err, "AWSStorage.GetObject.GetObjectWithContext")
 	}
 
-	buf, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "AWSStorage.GetObject.ReadAll")
-	}
-
-	return bytes.NewReader(buf), nil
+	return resp.Body, nil
 }
 
 // GetDownloadURL create Presigned URL for downloading given file.
