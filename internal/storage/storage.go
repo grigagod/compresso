@@ -8,12 +8,11 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/grigagod/compresso/internal/models"
 	"github.com/pkg/errors"
 )
 
 type Storage interface {
-	PutObject(ctx context.Context, input models.UploadInput) error
+	PutObject(ctx context.Context, input UploadInput) error
 	GetObject(ctx context.Context, fileName string) (io.ReadSeeker, error)
 	GetDownloadURL(fileName string) (string, error)
 }
@@ -33,12 +32,13 @@ func NewAWSStorage(cfg Config, client *s3.S3) *AWSStorage {
 }
 
 // PutObject upoad given input to the bucket.
-func (s *AWSStorage) PutObject(ctx context.Context, input models.UploadInput) error {
+func (s *AWSStorage) PutObject(ctx context.Context, input UploadInput) error {
 	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
-		Body:        input.File,
-		Bucket:      aws.String(s.cfg.Bucket),
-		Key:         aws.String(input.Name),
-		ContentType: aws.String(input.ContentType),
+		Body:          input.File,
+		Bucket:        aws.String(s.cfg.Bucket),
+		Key:           aws.String(input.Name),
+		ContentType:   aws.String(input.ContentType),
+		ContentLength: aws.Int64(input.Size),
 	})
 	if err != nil {
 		return errors.Wrap(err, "AWSStorage.PutObject")

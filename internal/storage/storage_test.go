@@ -10,7 +10,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/request"
-	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/pkg/db/aws"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -28,9 +27,10 @@ func TestAWSStorage_BasicOperations(t *testing.T) {
 	file := []byte(string("hello S3!"))
 
 	t.Run("PutObject", func(t *testing.T) {
-		input := models.UploadInput{
+		input := UploadInput{
 			File:        bytes.NewReader(file),
 			Name:        string("test_basic.txt"),
+			Size:        int64(len(file)),
 			ContentType: string("text/plain"),
 		}
 		err := storage.PutObject(context.Background(), input)
@@ -59,9 +59,10 @@ func TestAWSStorage_BasicOperations(t *testing.T) {
 	})
 
 	t.Run("PutObjectContextTimeout", func(t *testing.T) {
-		input := models.UploadInput{
+		input := UploadInput{
 			File:        bytes.NewReader(file),
 			Name:        string("test_basic.txt"),
+			Size:        int64(len(file)),
 			ContentType: string("text/plain"),
 		}
 		ctx, _ := context.WithTimeout(context.Background(), time.Microsecond)
