@@ -11,7 +11,7 @@ import (
 
 type Storage interface {
 	PutObject(ctx context.Context, input UploadInput) error
-	GetObject(ctx context.Context, fileName string) (io.ReadSeeker, error)
+	GetObject(ctx context.Context, fileName string) (io.ReadCloser, error)
 	GetDownloadURL(fileName string) (string, error)
 }
 
