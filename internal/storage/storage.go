@@ -6,37 +6,38 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 	"github.com/pkg/errors"
 )
 
 type Storage interface {
-	PutObject(ctx context.Context, input UploadInput) error
+	PutObject(ctx context.Context, file io.Reader, fileName string) error
 	GetObject(ctx context.Context, fileName string) (io.ReadCloser, error)
 	GetDownloadURL(fileName string) (string, error)
 }
 
 // AWSStorage imlements Storage interface.
 type AWSStorage struct {
-	cfg    Config
-	client *s3.S3
+	cfg      Config
+	client   *s3.S3
+	uploader *s3manager.Uploader
 }
 
 // NewAWSStorage create new AWSStorage with given config and S3 client.
 func NewAWSStorage(cfg Config, client *s3.S3) *AWSStorage {
 	return &AWSStorage{
-		cfg:    cfg,
-		client: client,
+		cfg:      cfg,
+		client:   client,
+		uploader: s3manager.NewUploaderWithClient(client),
 	}
 }
 
-// PutObject upoad given input to the bucket.
-func (s *AWSStorage) PutObject(ctx context.Context, input UploadInput) error {
-	_, err := s.client.PutObjectWithContext(ctx, &s3.PutObjectInput{
-		Body:          input.File,
-		Bucket:        aws.String(s.cfg.Bucket),
-		Key:           aws.String(input.Name),
-		ContentType:   aws.String(input.ContentType),
-		ContentLength: aws.Int64(input.Size),
+// PutObject upoad given file to the bucket.
+func (s *AWSStorage) PutObject(ctx context.Context, file io.Reader, fileName string) error {
+	_, err := s.uploader.UploadWithContext(ctx, &s3manager.UploadInput{
+		Body:   file,
+		Bucket: aws.String(s.cfg.Bucket),
+		Key:    aws.String(fileName),
 	})
 	if err != nil {
 		return errors.Wrap(err, "AWSStorage.PutObject")
