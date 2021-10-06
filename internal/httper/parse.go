@@ -1,10 +1,13 @@
 package httper
 
 import (
-	"database/sql"
 	"errors"
 	"net/http"
 	"strings"
+
+	"github.com/golang-jwt/jwt"
+	"github.com/jackc/pgconn"
+	"github.com/jackc/pgerrcode"
 )
 
 func ParseValidatorError(err error) Error {
@@ -16,16 +19,31 @@ func ParseValidatorError(err error) Error {
 		return NewStatusMsg(http.StatusBadRequest, InvalidUsernameMsg)
 	}
 
-	return NewStatusError(http.StatusBadRequest, err.Error())
+	return NewStatusError(http.StatusBadRequest, err)
 }
 
 func ParseSqlError(err error) Error {
-	if errors.Is(err, sql.ErrNoRows) {
-		return NewStatusMsg(http.StatusNotFound, UserNotFoundMsg)
-	}
-	if strings.Contains(err.Error(), "23505") {
-		return NewStatusMsg(http.StatusBadRequest, UserExistsMsg)
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) {
+		switch pgErr.Code {
+		case pgerrcode.UniqueViolation:
+			return NewBadRequestMsg(UserExistsMsg)
+		case pgerrcode.NoDataFound:
+			return NewBadRequestMsg(UserNotFoundMsg)
+		}
 	}
 
-	return NewStatusError(http.StatusBadRequest, err.Error())
+	return NewBadRequestError(err)
+}
+
+func ParseJWTError(err error) Error {
+	var jwtErr *jwt.ValidationError
+	if errors.As(err, &jwtErr) {
+		switch jwtErr.Errors {
+		case jwt.ValidationErrorExpired:
+			return NewStatusMsg(http.StatusUnauthorized, TokenExpiredMsg)
+		}
+	}
+
+	return NewStatusMsg(http.StatusUnauthorized, InvalidTokenMsg)
 }
