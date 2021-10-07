@@ -39,7 +39,7 @@ func (h *authHandlers) Register() http.Handler {
 		var req AuthRequest
 
 		if err := utils.StructScan(r, &req); err != nil {
-			return httper.NewStatusError(http.StatusBadRequest, err.Error())
+			return httper.NewBadRequestError(err)
 		}
 
 		err := utils.ValidateStruct(&req)
@@ -47,7 +47,7 @@ func (h *authHandlers) Register() http.Handler {
 			return httper.ParseValidatorError(err)
 		}
 
-		user, err := h.authUC.Register(&auth.User{
+		user, err := h.authUC.Register(r.Context(), &auth.User{
 			ID:        uuid.New(),
 			Username:  req.Username,
 			Password:  req.Password,
@@ -81,10 +81,10 @@ func (h *authHandlers) Login() http.Handler {
 		var req AuthRequest
 
 		if err := utils.StructScan(r, &req); err != nil {
-			return httper.NewStatusError(http.StatusBadRequest, err.Error())
+			return httper.NewBadRequestError(err)
 		}
 
-		user, err := h.authUC.Login(&auth.User{
+		user, err := h.authUC.Login(r.Context(), &auth.User{
 			Username: req.Username,
 			Password: req.Password,
 		})
