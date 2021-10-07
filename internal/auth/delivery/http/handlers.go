@@ -39,7 +39,7 @@ func (h *authHandlers) Register() http.Handler {
 		var req AuthRequest
 
 		if err := utils.StructScan(r, &req); err != nil {
-			return httper.NewStatusError(http.StatusBadRequest, err.Error())
+			return httper.NewBadRequestError(err)
 		}
 
 		err := utils.ValidateStruct(&req)
@@ -81,7 +81,7 @@ func (h *authHandlers) Login() http.Handler {
 		var req AuthRequest
 
 		if err := utils.StructScan(r, &req); err != nil {
-			return httper.NewStatusError(http.StatusBadRequest, err.Error())
+			return httper.NewBadRequestError(err)
 		}
 
 		user, err := h.authUC.Login(&auth.User{
