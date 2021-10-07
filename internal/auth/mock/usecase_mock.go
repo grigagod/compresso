@@ -5,6 +5,7 @@
 package mock
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -35,31 +36,31 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 }
 
 // Login mocks base method.
-func (m *MockUseCase) Login(user *auth.User) (*auth.UserWithToken, error) {
+func (m *MockUseCase) Login(ctx context.Context, user *auth.User) (*auth.UserWithToken, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Login", user)
+	ret := m.ctrl.Call(m, "Login", ctx, user)
 	ret0, _ := ret[0].(*auth.UserWithToken)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Login indicates an expected call of Login.
-func (mr *MockUseCaseMockRecorder) Login(user interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) Login(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockUseCase)(nil).Login), user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Login", reflect.TypeOf((*MockUseCase)(nil).Login), ctx, user)
 }
 
 // Register mocks base method.
-func (m *MockUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
+func (m *MockUseCase) Register(ctx context.Context, user *auth.User) (*auth.UserWithToken, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Register", user)
+	ret := m.ctrl.Call(m, "Register", ctx, user)
 	ret0, _ := ret[0].(*auth.UserWithToken)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Register indicates an expected call of Register.
-func (mr *MockUseCaseMockRecorder) Register(user interface{}) *gomock.Call {
+func (mr *MockUseCaseMockRecorder) Register(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockUseCase)(nil).Register), user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Register", reflect.TypeOf((*MockUseCase)(nil).Register), ctx, user)
 }

@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -39,7 +40,7 @@ func TestAuthRepo_Create(t *testing.T) {
 			WithArgs(&user.ID, &user.Username, &user.Password, &user.CreatedAt).
 			WillReturnRows(rows)
 
-		createdUser, err := authRepo.Create(user)
+		createdUser, err := authRepo.Create(context.Background(), user)
 
 		require.NoError(t, err)
 		require.Equal(t, createdUser, user)
@@ -73,7 +74,7 @@ func TestAuthRepo_FindByName(t *testing.T) {
 		query := `SELECT * FROM svc.users WHERE username = $1`
 		mock.ExpectQuery(query).WithArgs(user.Username).WillReturnRows(rows)
 
-		foundUser, err := authRepo.FindByName(user.Username)
+		foundUser, err := authRepo.FindByName(context.Background(), user.Username)
 
 		require.NoError(t, err)
 		require.Equal(t, foundUser, user)

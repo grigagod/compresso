@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/httper"
@@ -16,8 +18,8 @@ func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) *AuthUseCase {
 	return &AuthUseCase{cfg: cfg, authRepo: authRepo}
 }
 
-func (u *AuthUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
-	existsUser, err := u.authRepo.FindByName(user.Username)
+func (u *AuthUseCase) Register(ctx context.Context, user *auth.User) (*auth.UserWithToken, error) {
+	existsUser, err := u.authRepo.FindByName(ctx, user.Username)
 	if existsUser != nil || err == nil {
 		return nil, httper.NewBadRequestMsg(httper.UserExistsMsg)
 	}
@@ -26,7 +28,7 @@ func (u *AuthUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
 		return nil, err
 	}
 
-	createdUser, err := u.authRepo.Create(user)
+	createdUser, err := u.authRepo.Create(ctx, user)
 	if err != nil {
 		return nil, httper.ParseSqlError(err)
 	}
@@ -44,8 +46,8 @@ func (u *AuthUseCase) Register(user *auth.User) (*auth.UserWithToken, error) {
 	}, nil
 }
 
-func (u *AuthUseCase) Login(user *auth.User) (*auth.UserWithToken, error) {
-	foundUser, err := u.authRepo.FindByName(user.Username)
+func (u *AuthUseCase) Login(ctx context.Context, user *auth.User) (*auth.UserWithToken, error) {
+	foundUser, err := u.authRepo.FindByName(ctx, user.Username)
 	if err != nil {
 		return nil, httper.ParseSqlError(err)
 	}
