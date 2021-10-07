@@ -1,6 +1,9 @@
 package httper
 
-import "net/http"
+import (
+	"errors"
+	"net/http"
+)
 
 type Error interface {
 	error
@@ -9,10 +12,10 @@ type Error interface {
 
 type StatusError struct {
 	Code int
-	Err  string
+	Err  error
 }
 
-func NewStatusError(code int, err string) StatusError {
+func NewStatusError(code int, err error) StatusError {
 	return StatusError{
 		Code: code,
 		Err:  err,
@@ -22,19 +25,20 @@ func NewStatusError(code int, err string) StatusError {
 func NewStatusMsg(code int, msg ErrMessage) StatusError {
 	return StatusError{
 		Code: code,
-		Err:  string(msg),
+		Err:  errors.New(string(msg)),
 	}
+}
+
+func NewBadRequestError(err error) StatusError {
+	return NewStatusError(http.StatusBadRequest, err)
 }
 
 func NewBadRequestMsg(msg ErrMessage) StatusError {
-	return StatusError{
-		Code: http.StatusBadRequest,
-		Err:  string(msg),
-	}
+	return NewStatusMsg(http.StatusBadRequest, msg)
 }
 
 func (st StatusError) Error() string {
-	return st.Err
+	return st.Err.Error()
 }
 
 func (st StatusError) Status() int {
