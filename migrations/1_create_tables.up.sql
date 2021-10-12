@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS svc.users (
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'video_format') THEN
-        CREATE TYPE image_format AS ENUM('mkv', 'webm');
+        CREATE TYPE video_format AS ENUM('mkv', 'webm');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'processing') THEN
@@ -39,6 +39,5 @@ CREATE TABLE IF NOT EXISTS svc.video_tickets (
     format        video_format NOT NULL,
     crf           SMALLINT NOT NULL,
     url           TEXT,
-    created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL
+    created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL
 );
