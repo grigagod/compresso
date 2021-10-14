@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS svc.users (
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'video_format') THEN
-        CREATE TYPE video_format AS ENUM('mkv', 'webm');
+        CREATE TYPE video_format AS ENUM('matroska', 'webm');
     END IF;
 
     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'processing') THEN
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS svc.video_tickets (
     video_id      UUID NOT NULL REFERENCES svc.user_videos (video_id),
     author_id     UUID NOT NULL REFERENCES svc.users (user_id),
     state         processing_state NOT NULL,
-    format        video_format NOT NULL,
+    target_format video_format NOT NULL,
     crf           SMALLINT NOT NULL,
     url           TEXT,
     created_at    TIMESTAMP WITHOUT TIME ZONE NOT NULL

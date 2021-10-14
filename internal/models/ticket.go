@@ -18,7 +18,7 @@ const (
 type Ticket struct {
 	ID        uuid.UUID       `db:"ticket_id" json:"ticket_id"`
 	AuthorID  uuid.UUID       `db:"author_id" json:"author_id"`
-	State     ProcessingState `db:"processing_state" json:"processing_state"`
+	State     ProcessingState `db:"state" json:"state"`
 	URL       string          `db:"url" json:"url"`
 	CreatedAt time.Time       `db:"created_at" json:"created_at"`
 }
