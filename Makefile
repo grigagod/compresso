@@ -1,10 +1,10 @@
-.PHONY: clean test auth build run local
+.PHONY: clean test auth build run local videoapi
 
 BUILD_DIR = $(PWD)/build
 MIGRATIONS= $(PWD)/migrations/
 DATABASE = postgres://postgres:121073@localhost/compresso?sslmode=disable
 
-test: 
+test:
 	go test -v -timeout 30s -cover ./...
 
 lint:
@@ -37,6 +37,31 @@ auth.run: auth.clean auth.build
 
 auth.swag:
 	swag init -g cmd/auth/main.go -o docs/auth --exclude internal/image
+
+
+# ===================================================
+# Videoapi
+videoapi.clean:
+	rm $(BUILD_DIR)/videoapi
+
+videoapi.build:
+	go build -ldflags="-w -s" -o $(BUILD_DIR)/videoapi cmd/videoapi/main.go
+
+videoapi.run: videoapi.clean videoapi.build
+	$(BUILD_DIR)/videoapi
+
+
+
+# ===================================================
+# Videosvc
+videosvc.clean:
+	rm $(BUILD_DIR)/videosvc
+
+videosvc.build:
+	go build -ldflags="-w -s" -o $(BUILD_DIR)/videosvc cmd/videosvc/main.go
+
+videosvc.run: videosvc.clean videosvc.build
+	$(BUILD_DIR)/videosvc
 
 
 # ==============================================================================
