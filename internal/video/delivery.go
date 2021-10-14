@@ -2,7 +2,7 @@ package video
 
 import "net/http"
 
-type Delivery interface {
+type Handlers interface {
 	UploadVideo() http.Handler
 	CreateTicket() http.Handler
 }

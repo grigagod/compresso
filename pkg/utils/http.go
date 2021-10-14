@@ -2,7 +2,10 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+
+	"github.com/grigagod/compresso/pkg/converter"
 )
 
 // StructScan decodes(as json) request body into model.
@@ -33,4 +36,32 @@ func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(resp)
+}
+
+var allowedVideoContentTypes = map[string]converter.VideoFormat{
+	"video/x-matroska": converter.MKV,
+	"video/webm":       converter.WebM,
+}
+
+var allowedVideoFormats = map[string]converter.VideoFormat{
+	"matroska": converter.MKV,
+	"webm":     converter.WebM,
+}
+
+func DetectVideoFormatFromHeader(header string) (converter.VideoFormat, error) {
+	f, ok := allowedVideoContentTypes[header]
+	if !ok {
+		return converter.VideoFormat(""), errors.New("this content type is not allowed")
+	}
+
+	return f, nil
+}
+
+func DetectVideoFormat(format string) (converter.VideoFormat, error) {
+	f, ok := allowedVideoFormats[format]
+	if !ok {
+		return converter.VideoFormat(""), errors.New("this content type is not allowed")
+	}
+
+	return f, nil
 }
