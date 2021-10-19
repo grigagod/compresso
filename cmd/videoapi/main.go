@@ -44,6 +44,7 @@ func main() {
 	if err != nil {
 		logger.Fatal("RMQ connection failed:", err)
 	}
+	defer ch.Close()
 	pub := rmq.NewPublisher(ch)
 
 	s := server.NewVideoServer(&cfg.APIsvc, db, storage, pub, logger)

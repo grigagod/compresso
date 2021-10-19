@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/grigagod/compresso/internal/config"
 	"github.com/grigagod/compresso/internal/storage"
@@ -45,11 +47,25 @@ func main() {
 	if err != nil {
 		logger.Fatal("RMQ connection failed:", err)
 	}
+	defer ch.Close()
 
 	svc := convsvc.NewService(ch, db, storage, logger)
 
-	if err := svc.Run(context.Background(), &cfg.QueueReadConfig); err != nil {
-		logger.Fatal()
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Gracefully shutdown
+	go func(cancel context.CancelFunc) {
+		done := make(chan os.Signal, 1)
+		signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+		<-done
+		logger.Infof("Shutting down gracefully")
+
+		cancel()
+	}(cancel)
+
+	if err := svc.Run(ctx, &cfg.QueueReadConfig); err != nil {
+		logger.Fatal("Service failed to run:", err)
 	}
 
 }
