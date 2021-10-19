@@ -1,0 +1,28 @@
+DB:
+  Host: localhost
+  Port: 5432
+  User: postgres
+  DbName: compresso
+  Password: 121073
+  Driver: pgx
+
+Storage:
+  Bucket: compresso-test
+  PresignDuration: 5m
+
+RMQ:
+  Proto: amqp://
+  Host: 127.0.0.1
+  Port: 5672
+  User: guest
+  Password: guest
+
+QueueReadConfig:
+  Name: video
+  Consumer: convsvc
+  Durable: true
+  AutoDelete: false
+  AutoAck: false
+  Exclusive: false
+  NoLocal: false
+  NoWait: false

@@ -12,25 +12,16 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=121073
       - POSTGRES_DB=compresso
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 5s
-      timeout: 3s
-      retries: 5 
-      start_period: 1s
     networks:
       - web_api
-  
-  migrate:
-    image: migrate/migrate
-    volumes: 
-      - ./migrations:/migrations
-    command: ["-path", "/migrations", "-database",  "postgres://postgres:121073@postgresql:5432/compresso?sslmode=disable", "up", "1"]
-    depends_on:
-      postgresql:
-        condition: service_healthy
-    networks:
-      - web_api
+
+  rabbitmq3:
+    image: rabbitmq:3-management
+    ports:
+      # AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
 
 networks:
   web_api:

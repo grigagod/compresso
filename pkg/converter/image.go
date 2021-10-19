@@ -19,7 +19,7 @@ var (
 var pngEnc png.Encoder
 
 // ProcessImage process image from source with given options.
-func ProcessImage(src io.Reader, dst io.Writer, currentFormat imageFormat, ratio int) error {
+func ProcessImage(src io.Reader, dst io.Writer, currentFormat ImageFormat, ratio int) error {
 	img, err := DecodeImage(src, currentFormat)
 	if err != nil {
 		return err
@@ -50,7 +50,7 @@ func ProcessImage(src io.Reader, dst io.Writer, currentFormat imageFormat, ratio
 }
 
 // DecodeImage decode image of supported formats.
-func DecodeImage(src io.Reader, current imageFormat) (image.Image, error) {
+func DecodeImage(src io.Reader, current ImageFormat) (image.Image, error) {
 	switch current {
 	case PNG:
 		img, err := png.Decode(src)

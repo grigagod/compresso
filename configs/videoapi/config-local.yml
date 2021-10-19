@@ -1,0 +1,34 @@
+HTTP:
+    Addr: :5001
+    ReadTimeout: 10s
+    WriteTimeout: 10s
+    IdleTimeout: 60s
+    Pprof: true
+    Swagger: false
+    SwaggerUrl: "http://127.0.0.1:5001/swagger/video/doc.json"
+
+DB:
+  Host: localhost
+  Port: 5432
+  User: postgres
+  DbName: compresso
+  Password: 121073
+  Driver: pgx
+
+Storage:
+  Bucket: compresso-test
+  PresignDuration: 5m
+
+RMQ:
+  Proto: amqp://
+  Host: 127.0.0.1
+  Port: 5672
+  User: guest
+  Password: guest
+
+APIsvc:
+  JwtSecretKey: 8Zz5tw0Ionm3XPZZfN0NOml3z9FMfmpgXwovR9fp6ryDIoGRM8EPHAB6iHsc0fb
+  QueueWriteConfig:
+    Name: video
+    Mandatory: true
+    Immediate: false

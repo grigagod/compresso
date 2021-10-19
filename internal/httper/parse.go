@@ -1,6 +1,7 @@
 package httper
 
 import (
+	"database/sql"
 	"errors"
 	"net/http"
 	"strings"
@@ -28,9 +29,11 @@ func ParseSqlError(err error) Error {
 		switch pgErr.Code {
 		case pgerrcode.UniqueViolation:
 			return NewBadRequestMsg(UserExistsMsg)
-		case pgerrcode.NoDataFound:
-			return NewBadRequestMsg(UserNotFoundMsg)
 		}
+	}
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return NewBadRequestMsg(UserNotFoundMsg)
 	}
 
 	return NewBadRequestError(err)

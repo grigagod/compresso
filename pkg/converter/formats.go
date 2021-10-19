@@ -2,23 +2,23 @@ package converter
 
 // Media formats supported by pkg definitions
 
-type imageFormat string
+type ImageFormat string
 
 const (
-	PNG imageFormat = "png"
-	JPG imageFormat = "jpg"
+	PNG ImageFormat = "png"
+	JPG ImageFormat = "jpg"
 )
 
-type videoFormat string
+type VideoFormat string
 
 const (
-	MKV  videoFormat = "matroska"
-	WebM videoFormat = "webm"
+	MKV  VideoFormat = "matroska"
+	WebM VideoFormat = "webm"
 )
 
-type audioFormat string
+type AudioFormat string
 
 const (
-	MP3 audioFormat = "mp3"
-	WAV audioFormat = "wav"
+	MP3 AudioFormat = "mp3"
+	WAV AudioFormat = "wav"
 )

@@ -13,7 +13,7 @@ var (
 )
 
 // ProcessAudio process(convert) audio from source with given formats.
-func ProcessAudio(ctx context.Context, src io.Reader, dst io.Writer, currentFormat, targetFormat audioFormat) error {
+func ProcessAudio(ctx context.Context, src io.Reader, dst io.Writer, currentFormat, targetFormat AudioFormat) error {
 	return fluentffmpeg.NewCommand("").
 		PipeInput(src).
 		PipeOutput(dst).
