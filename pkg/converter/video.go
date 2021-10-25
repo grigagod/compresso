@@ -8,6 +8,7 @@ import (
 	fluentffmpeg "github.com/modfy/fluent-ffmpeg"
 )
 
+// Package defined errors for video processing.
 var (
 	ErrVideoCRF = errors.New("CRF value is out of range")
 )

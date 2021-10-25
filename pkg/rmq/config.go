@@ -29,11 +29,15 @@ func NewAMQPConfig(proto, host, port, user, password string) *Config {
 // URL return connection url.
 func (r *Config) URL() string {
 	var parts []string
+
 	parts = append(parts, r.Proto)
+
 	if r.Password != "" {
 		parts = append(parts, r.User, ":", r.Password, "@")
 	}
+
 	parts = append(parts, r.Host, ":", r.Port)
+
 	return strings.Join(parts, "")
 }
 

@@ -26,8 +26,7 @@ func ParseValidatorError(err error) Error {
 func ParseSqlError(err error) Error {
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) {
-		switch pgErr.Code {
-		case pgerrcode.UniqueViolation:
+		if pgErr.Code == pgerrcode.UniqueViolation {
 			return NewBadRequestMsg(UserExistsMsg)
 		}
 	}
@@ -42,8 +41,7 @@ func ParseSqlError(err error) Error {
 func ParseJWTError(err error) Error {
 	var jwtErr *jwt.ValidationError
 	if errors.As(err, &jwtErr) {
-		switch jwtErr.Errors {
-		case jwt.ValidationErrorExpired:
+		if jwtErr.Errors == jwt.ValidationErrorExpired {
 			return NewStatusMsg(http.StatusUnauthorized, TokenExpiredMsg)
 		}
 	}

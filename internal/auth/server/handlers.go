@@ -10,7 +10,7 @@ import (
 )
 
 func (s *AuthServer) MapHandlers() {
-	aRepo := authRepo.NewAuthRepository(s.Db)
+	aRepo := authRepo.NewAuthRepository(s.DB)
 	aUseCase := authUseCase.NewAuthUseCase(s.authCfg, aRepo)
 	aHandlers := authHttp.NewAuthHandlers(s.authCfg, aUseCase)
 

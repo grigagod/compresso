@@ -1,3 +1,4 @@
+// Package rmq defines set of functions and types for working with RabbitMQ.
 package rmq
 
 import "github.com/streadway/amqp"
@@ -14,6 +15,7 @@ func NewChannelFromConfig(config *Config) (*Channel, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	ch, err := conn.Channel()
 	if err != nil {
 		return nil, err
@@ -31,5 +33,6 @@ func (c *Channel) Close() error {
 	if err != nil {
 		return err
 	}
+
 	return c.connection.Close()
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/httper"
-	"github.com/grigagod/compresso/pkg/utils"
+	"github.com/grigagod/compresso/internal/utils"
 )
 
 type authHandlers struct {
@@ -33,7 +33,7 @@ func NewAuthHandlers(cfg *config.Auth, authUC auth.UseCase) auth.Handlers {
 // @Success 201 {object} models.UserWithToken
 // @Failure 400 {string} string "Provided credentials don't match requirements"
 // @Failure 409 {string} string "User with such username already exists"
-// @Router /register [post]
+// @Router /register [post].
 func (h *authHandlers) Register() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		var req AuthRequest
@@ -75,7 +75,7 @@ func (h *authHandlers) Register() http.Handler {
 // @Success 200 {object} models.UserWithToken
 // @Failure 400 {string} string "User with such username is not found"
 // @Failure 400 {string} string "Provided password is wrong"
-// @Router /login [post]
+// @Router /login [post].
 func (h *authHandlers) Login() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		var req AuthRequest

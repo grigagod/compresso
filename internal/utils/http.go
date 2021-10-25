@@ -1,3 +1,4 @@
+// Package utils provides helper functions.
 package utils
 
 import (
@@ -38,18 +39,19 @@ func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) {
 	w.Write(resp)
 }
 
-var allowedVideoContentTypes = map[string]converter.VideoFormat{
+var AllowedVideoContentTypes = map[string]converter.VideoFormat{
 	"video/x-matroska": converter.MKV,
 	"video/webm":       converter.WebM,
 }
 
-var allowedVideoFormats = map[string]converter.VideoFormat{
+var AllowedVideoFormats = map[string]converter.VideoFormat{
 	"matroska": converter.MKV,
 	"webm":     converter.WebM,
 }
 
+// DetectVideoFormat detect converter.VideoFormat from header.
 func DetectVideoFormatFromHeader(header string) (converter.VideoFormat, error) {
-	f, ok := allowedVideoContentTypes[header]
+	f, ok := AllowedVideoContentTypes[header]
 	if !ok {
 		return converter.VideoFormat(""), errors.New("this content type is not allowed")
 	}
@@ -57,8 +59,9 @@ func DetectVideoFormatFromHeader(header string) (converter.VideoFormat, error) {
 	return f, nil
 }
 
+// DetectVideoFormat detect converter.VideoFormat from string.
 func DetectVideoFormat(format string) (converter.VideoFormat, error) {
-	f, ok := allowedVideoFormats[format]
+	f, ok := AllowedVideoFormats[format]
 	if !ok {
 		return converter.VideoFormat(""), errors.New("this content type is not allowed")
 	}

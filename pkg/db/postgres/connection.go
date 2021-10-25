@@ -1,3 +1,4 @@
+// Package postgres provides connection to PosgresSQL.
 package postgres
 
 import (
@@ -15,7 +16,7 @@ const (
 	connMaxIdleTime = 20
 )
 
-// Return new Postgresql db instance
+// NewPsqlDB return new sqlx.DB instance.
 func NewPsqlDB(host string, port string, user string, dbname string, password string, driver string) (*sqlx.DB, error) {
 	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
 		host,
@@ -34,6 +35,7 @@ func NewPsqlDB(host string, port string, user string, dbname string, password st
 	db.SetConnMaxLifetime(connMaxLifetime * time.Second)
 	db.SetMaxIdleConns(maxIdleConns)
 	db.SetConnMaxIdleTime(connMaxIdleTime * time.Second)
+
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}

@@ -1,3 +1,4 @@
+// Package usecase implements video service usecases.
 package usecase
 
 import (
@@ -7,9 +8,9 @@ import (
 
 	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/internal/storage"
+	"github.com/grigagod/compresso/internal/utils"
 	"github.com/grigagod/compresso/internal/video"
 	"github.com/grigagod/compresso/pkg/rmq"
-	"github.com/grigagod/compresso/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/streadway/amqp"
 )
@@ -47,6 +48,7 @@ func (u *VideoUseCase) UploadVideo(ctx context.Context, video *models.Video, fil
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.UploadVideo.GetDownloadURL")
 	}
+
 	v.URL = url
 
 	return v, nil
@@ -86,6 +88,7 @@ func (u *VideoUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTic
 	if err != nil {
 		ticket.State = models.Failed
 		_, err := u.repo.UpdateTicket(ctx, ticket)
+
 		return nil, errors.Wrap(err, "VideoUseCase.CreateTicket.Send")
 	}
 

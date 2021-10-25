@@ -13,7 +13,7 @@ import (
 type AuthServer struct {
 	authCfg *config.Auth
 	Router  *chi.Mux
-	Db      *sqlx.DB
+	DB      *sqlx.DB
 	Log     logger.Logger
 }
 
@@ -21,7 +21,7 @@ func NewAuthServer(cfg *config.Auth, db *sqlx.DB, log logger.Logger) *AuthServer
 	return &AuthServer{
 		authCfg: cfg,
 		Router:  chi.NewMux(),
-		Db:      db,
+		DB:      db,
 		Log:     log,
 	}
 }

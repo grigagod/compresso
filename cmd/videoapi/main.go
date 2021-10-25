@@ -27,7 +27,7 @@ func main() {
 	}
 
 	db, err := postgres.NewPsqlDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
-		cfg.DB.DbName, cfg.DB.Password, cfg.DB.Driver)
+		cfg.DB.DBName, cfg.DB.Password, cfg.DB.Driver)
 	if err != nil {
 		logger.Fatal("Postgres connection failed:", err)
 	}
@@ -37,6 +37,7 @@ func main() {
 	if err != nil {
 		logger.Fatal("AWS S3 session failed:", err)
 	}
+
 	storage := storage.NewAWSStorage(cfg.Storage, s3client)
 	logger.Infof("AWS Bucket: %s", cfg.Storage.Bucket)
 

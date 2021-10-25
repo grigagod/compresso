@@ -49,12 +49,6 @@ linters-settings:
     # Setting locale to US will correct the British spelling of 'colour' to 'color'.
     locale: US
 
-  staticcheck:
-    # Select the Go version to target. The default is '1.13'.
-    go: "1.17.x"
-    # https://staticcheck.io/docs/options#checks
-    checks: [ "all" ]
-
   whitespace:
     multi-if: true # Enforces newlines (or comments) after every multi-line if statement
     multi-func: true # Enforces newlines (or comments) after every multi-line function signature
@@ -71,9 +65,9 @@ linters:
     - misspell
     - nestif
     - revive
+    - staticcheck
     - stylecheck
     - whitespace
-    - wsl
   fast: false
 
 
@@ -81,11 +75,10 @@ issues:
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclude-rules:
     # Exclude some linters from running on tests files.
-    - path: _test\.go
+    - path: internal/*
       linters:
-        - gocyclo
-        - dupl
-        - gosec
+        - stylecheck
+        - revive
 
   # Independently from option `exclude` we use default exclude patterns,
   # it can be disabled by this option. To list all

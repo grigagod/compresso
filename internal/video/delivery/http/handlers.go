@@ -8,9 +8,9 @@ import (
 	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/middleware"
 	"github.com/grigagod/compresso/internal/models"
+	"github.com/grigagod/compresso/internal/utils"
 	"github.com/grigagod/compresso/internal/video"
 	"github.com/grigagod/compresso/pkg/converter"
-	"github.com/grigagod/compresso/pkg/utils"
 )
 
 type videoHandlers struct {
@@ -55,6 +55,7 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 func (h *videoHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userId := r.Context().Value(middleware.UserIDCtxKey{}).(uuid.UUID)
+
 		var req CreateTicketRequest
 
 		if err := utils.StructScan(r, &req); err != nil {

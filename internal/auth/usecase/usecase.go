@@ -6,7 +6,7 @@ import (
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/httper"
-	"github.com/grigagod/compresso/pkg/utils"
+	"github.com/grigagod/compresso/internal/utils"
 )
 
 type AuthUseCase struct {

@@ -32,7 +32,7 @@ func main() {
 	}
 
 	db, err := postgres.NewPsqlDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
-		cfg.DB.DbName, cfg.DB.Password, cfg.DB.Driver)
+		cfg.DB.DBName, cfg.DB.Password, cfg.DB.Driver)
 	if err != nil {
 		logger.Fatal("Postgres connection failed:", err)
 	}

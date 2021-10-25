@@ -17,7 +17,7 @@ jobs:
     steps:
       -
         name: Checkout code
-        uses: actions/chechout@v2
+        uses: actions/checkout@v2
       -
         name: Install go
         uses: actions/setup-go@v2

@@ -7,10 +7,13 @@ on:
       - dev
 
 jobs:
-  golangci:
+  lint:
     name: lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: golangci-lint
+      -
+        name: Checkout code
+        uses: actions/checkout@v2
+      -
+        name: golangci-lint
         uses: golangci/golangci-lint-action@v2

@@ -8,6 +8,7 @@ import (
 	fluentffmpeg "github.com/modfy/fluent-ffmpeg"
 )
 
+// Package defined errors for audio processing.
 var (
 	ErrAudioFormat = errors.New("unsupported audio format")
 )

@@ -30,7 +30,7 @@ func main() {
 	}
 
 	db, err := postgres.NewPsqlDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
-		cfg.DB.DbName, cfg.DB.Password, cfg.DB.Driver)
+		cfg.DB.DBName, cfg.DB.Password, cfg.DB.Driver)
 	if err != nil {
 		logger.Fatalf("Postgres connection failed:", err)
 	}
@@ -67,5 +67,4 @@ func main() {
 	if err := svc.Run(ctx, &cfg.QueueReadConfig); err != nil {
 		logger.Fatal("Service failed to run:", err)
 	}
-
 }
