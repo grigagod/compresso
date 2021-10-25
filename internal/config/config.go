@@ -36,9 +36,9 @@ func PreloadConfig(filepath string) (*viper.Viper, error) {
 
 // GetConfigPath returns config path for local or docker environment.
 func GetConfigPath(serviceName, configEnv string) string {
-	if configEnv == "docker" {
-		return fmt.Sprintf("./configs/%s/config-docker", serviceName)
+	if configEnv == "" {
+		return fmt.Sprintf("./configs/%s/config-local", serviceName)
 	}
 
-	return fmt.Sprintf("./configs/%s/config-local", serviceName)
+	return fmt.Sprintf("./configs/%s/config-%s", serviceName, configEnv)
 }

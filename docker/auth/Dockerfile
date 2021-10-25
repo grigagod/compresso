@@ -15,9 +15,9 @@ FROM scratch
 # Copy binary and config files from /auth to root folder of scratch container.
 COPY --from=builder ["/auth/authbin", "/"]
 COPY --from=builder ["/auth/docs/auth/", "/docs/auth/"]
-COPY --from=builder ["/auth/config/auth/", "/config/auth/"]
+COPY --from=builder ["/auth/configs/auth/", "/configs/auth/"]
 
-ENV config-auth=docker
+ENV config-file=prod
 
 # Export necessary port.
 EXPOSE 5000
