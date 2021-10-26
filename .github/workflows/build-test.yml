@@ -21,6 +21,9 @@ jobs:
           - 5672:5672
     steps:
       -
+        name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      -
         name: Checkout code
         uses: actions/checkout@v2
       -
@@ -31,9 +34,6 @@ jobs:
       -
         name: Build
         run: go build -v ./...
-      -
-        name: Install ffmpeg
-        run: sudo apt-get install -y ffmpeg
       -
         name: Test
         run: go test -v ./...
