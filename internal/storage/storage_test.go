@@ -5,6 +5,7 @@ import (
 	"context"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
@@ -16,7 +17,8 @@ import (
 )
 
 func TestAWSStorage_BasicOperations(t *testing.T) {
-	client, err := aws.NewClientWithSharedCredentials("../../.aws/credentials", "test")
+	client, err := aws.NewClientWithStaticCredentials(os.Getenv("AWS_REGION"),
+		os.Getenv("AWS_ACCESS_KEY_ID"), os.Getenv("AWS_SECRET_ACCESS_KEY"))
 	assert.NoError(t, err)
 
 	cfg := Config{
