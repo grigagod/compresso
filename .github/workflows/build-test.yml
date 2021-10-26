@@ -14,7 +14,7 @@ env:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    container: jrottenberg/ffmpeg:3-scratch
+    container: jrottenberg/ffmpeg:4.1-alpine
     services:
       rmq:
         image: rabbitmq:3-alpine
