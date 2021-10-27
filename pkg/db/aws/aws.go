@@ -33,3 +33,13 @@ func NewClientWithSharedCredentials(filename, profile string) (*s3.S3, error) {
 
 	return s3.New(sess), nil
 }
+
+// NewClientWithEnvCredentials create new S3 client with environment credentials.
+func NewClientWithEnvCredentials() (*s3.S3, error) {
+	sess, err := session.NewSession()
+	if err != nil {
+		return nil, err
+	}
+
+	return s3.New(sess), err
+}

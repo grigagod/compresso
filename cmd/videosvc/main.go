@@ -48,7 +48,7 @@ func main() {
 	}
 	defer db.Close()
 
-	s3client, err := aws.NewClientWithSharedCredentials("./.aws/credentials", "test")
+	s3client, err := aws.NewClientWithEnvCredentials()
 	if err != nil {
 		logger.Fatal("AWS S3 session failed:", err)
 	}

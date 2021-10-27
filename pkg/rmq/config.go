@@ -64,7 +64,7 @@ type QueueWriteConfig struct {
 	Immediate bool   `default:"false"`
 }
 
-// GetConfigFromEnv return queue write config from environment.
+// GetQueueWriteConfigFromEnv return queue write config from environment.
 func GetQueueWriteConfigFromEnv() (*QueueWriteConfig, error) {
 	c := new(QueueWriteConfig)
 	err := envconfig.Process(QueueWriteConfigPrefix, c)
@@ -85,7 +85,7 @@ type QueueReadConfig struct {
 	NoWait     bool   `split_words:"true" default:"false"`
 }
 
-// GetConfigFromEnv return queue read config from environment.
+// GetQueueReadConfigFromEnv return queue read config from environment.
 func GetQueueReadConfigFromEnv() (*QueueReadConfig, error) {
 	c := new(QueueReadConfig)
 	err := envconfig.Process(QueueReadConfigPrefix, c)

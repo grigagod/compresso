@@ -5,7 +5,7 @@
 build/
 
 # AWS credentials
-.aws/
+.aws
 
 # Production configs
 *prod.*

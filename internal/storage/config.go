@@ -11,8 +11,8 @@ const ConfigPrefix = "STORAGE"
 
 // Config should be used for configuring new storage instance.
 type Config struct {
-	Bucket          string
-	PresignDuration time.Duration `split_words:"true"`
+	Bucket          string        `required:"true"`
+	PresignDuration time.Duration `split_words:"true" required:"true"`
 }
 
 // GetConfigFromEnv return storage config from environment.
