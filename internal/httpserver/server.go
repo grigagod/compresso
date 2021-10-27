@@ -20,7 +20,7 @@ func ListenAndServe(cfg *Config, router *chi.Mux, log logger.Logger) {
 	}
 
 	if cfg.Swagger {
-		MapSwaggerHandler(router, cfg.SwaggerUrl)
+		MapSwaggerHandler(router, cfg.SwaggerURL)
 	}
 
 	srv := http.Server{

@@ -11,7 +11,7 @@ import (
 
 func (s *VideoServer) MapHandlers() {
 	vRepo := videoRepo.NewVideoRepository(s.DB)
-	vUseCase := videoUseCase.NewVideoUseCase(&s.cfg.QueueWriteConfig, vRepo, s.Storage, s.Publisher)
+	vUseCase := videoUseCase.NewVideoUseCase(s.cfg.QueueWriteConfig, vRepo, s.Storage, s.Publisher)
 	vHandlers := videoHttp.NewVideoHandlers(vUseCase)
 
 	videoRouter := s.Router.

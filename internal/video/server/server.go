@@ -11,7 +11,7 @@ import (
 )
 
 type VideoServer struct {
-	cfg       *config.APIsvc
+	cfg       *config.API
 	Router    *chi.Mux
 	DB        *sqlx.DB
 	Storage   storage.Storage
@@ -19,7 +19,7 @@ type VideoServer struct {
 	Log       logger.Logger
 }
 
-func NewVideoServer(cfg *config.APIsvc, db *sqlx.DB, storage storage.Storage, publisher *rmq.Publisher, log logger.Logger) *VideoServer {
+func NewVideoServer(cfg *config.API, db *sqlx.DB, storage storage.Storage, publisher *rmq.Publisher, log logger.Logger) *VideoServer {
 	return &VideoServer{
 		cfg:       cfg,
 		Router:    chi.NewMux(),
