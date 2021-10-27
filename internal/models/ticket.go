@@ -6,8 +6,10 @@ import (
 	"github.com/google/uuid"
 )
 
+// ProcessingState represent tiket's processing state.
 type ProcessingState string
 
+// Package defined processing states.
 const (
 	Queued     ProcessingState = "queued"
 	Processing ProcessingState = "processing"
@@ -15,6 +17,7 @@ const (
 	Failed     ProcessingState = "failed"
 )
 
+// Ticket is a skeleton for all kinds of media tickets.
 type Ticket struct {
 	ID        uuid.UUID       `db:"ticket_id" json:"ticket_id"`
 	AuthorID  uuid.UUID       `db:"author_id" json:"author_id"`

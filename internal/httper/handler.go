@@ -10,6 +10,7 @@ func (fn HandlerWithError) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			http.Error(w, e.Error(), http.StatusInternalServerError)
 		}
+
 		http.Error(w, err.Error(), err.Status())
 	}
 }

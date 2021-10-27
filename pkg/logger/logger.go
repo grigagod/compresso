@@ -1,3 +1,4 @@
+// Package logger provides logger interface.
 package logger
 
 import (
@@ -7,6 +8,7 @@ import (
 
 const skipCallers = 1
 
+// Logger defines logger inteface.
 type Logger interface {
 	Debugw(msg string, keyValues ...interface{})
 	Infow(msg string, keyValues ...interface{})
@@ -23,17 +25,19 @@ type Logger interface {
 	Fatalf(template string, args ...interface{})
 }
 
+// WrappedLogger imlements Logger interface unsing zap.SugaredLogger.
 type WrappedLogger struct {
 	*zap.SugaredLogger
 }
 
-// GetLoggerConfig returns example of configuration
+// GetLoggerConfig return example of configuration.
 func GetLoggerConfig() zap.Config {
 	cfg := zap.NewProductionConfig()
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 	return cfg
 }
 
+// NewWrappedLogger return new WrappedLogger with given config and additional args.
 func NewWrappedLogger(cfg zap.Config, args ...interface{}) (*WrappedLogger, error) {
 	l, err := cfg.Build(zap.AddCallerSkip(skipCallers))
 	if err != nil {

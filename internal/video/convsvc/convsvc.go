@@ -64,7 +64,7 @@ LOOP:
 
 				err := s.handleMsg(ctx, msg.Body)
 				if err != nil {
-					s.logger.Errorw("Error occured while processing msg", "error", err.Error(), "msg", msg.Body)
+					s.logger.Errorw("Error occurred while processing msg", "error", err.Error(), "msg", msg.Body)
 
 					err := msg.Nack(false, true)
 					if err != nil {
@@ -77,7 +77,6 @@ LOOP:
 				if err != nil {
 					s.logger.Errorw("Errorw ack message", "err", err, "msg", msg.Body)
 				}
-
 			}(msg)
 		}
 	}
@@ -112,8 +111,14 @@ func (s *Service) handleMsg(ctx context.Context, body []byte) error {
 	}
 
 	s.logger.Infow("Downloading original ticket", "ID", msg.TicketID.String())
+
 	src, err := s.storage.GetObject(ctx, msg.OriginURL)
-	defer src.Close()
+	defer func() {
+		err := src.Close()
+		if err != nil {
+			s.logger.Errorw("Error closing ReadCloser", err)
+		}
+	}()
 	if err != nil {
 		upderr := s.updateTicketState(ctx, ticket, models.Failed)
 		return errors.Wrap(upderr, err.Error())

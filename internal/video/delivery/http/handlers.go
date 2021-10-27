@@ -1,16 +1,15 @@
 package http
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/middleware"
 	"github.com/grigagod/compresso/internal/models"
+	"github.com/grigagod/compresso/internal/utils"
 	"github.com/grigagod/compresso/internal/video"
 	"github.com/grigagod/compresso/pkg/converter"
-	"github.com/grigagod/compresso/pkg/utils"
 )
 
 type videoHandlers struct {
@@ -37,16 +36,13 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 			AuthorID: userID,
 			Format:   format,
 		}
-		video.URL = utils.GenerateURL(video.AuthorID, video.ID)
 
 		v, err := h.videoUC.UploadVideo(r.Context(), &video, r.Body)
 		if err != nil {
 			return err
 		}
 
-		utils.RespondWithJSON(w, http.StatusCreated, &v)
-
-		return nil
+		return utils.RespondWithJSON(w, http.StatusCreated, &v)
 	}
 
 	return httper.HandlerWithError(fn)
@@ -55,22 +51,20 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 func (h *videoHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userId := r.Context().Value(middleware.UserIDCtxKey{}).(uuid.UUID)
+
 		var req CreateTicketRequest
 
 		if err := utils.StructScan(r, &req); err != nil {
-			log.Fatal(err)
 			return httper.NewBadRequestError(err)
 		}
 
 		err := utils.ValidateStruct(&req)
 		if err != nil {
-			log.Fatal(err)
 			return httper.ParseValidatorError(err)
 		}
 
 		err = converter.ValidateCRF(req.CRF)
 		if err != nil {
-			log.Fatal(err)
 			return httper.NewBadRequestError(err)
 		}
 
@@ -94,9 +88,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 			return err
 		}
 
-		utils.RespondWithJSON(w, http.StatusCreated, &t)
-
-		return nil
+		return utils.RespondWithJSON(w, http.StatusCreated, &t)
 	}
 
 	return httper.HandlerWithError(fn)

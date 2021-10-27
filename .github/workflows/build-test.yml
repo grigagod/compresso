@@ -1,0 +1,39 @@
+name: build-test
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    services:
+      rmq:
+        image: rabbitmq:3-alpine
+        ports:
+          - 5672:5672
+    steps:
+      -
+        name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      -
+        name: Checkout code
+        uses: actions/checkout@v2
+      -
+        name: Install go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.x
+      -
+        name: Build
+        run: go build -v ./...
+      -
+        name: Test
+        run: go test -v ./...

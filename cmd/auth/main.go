@@ -18,7 +18,7 @@ import (
 // @description This is an auto-generated API Docs.
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
-// @contact.email podkidysh2002@gmail.com
+// @contact.email podkidysh2002@gmail.com.
 func main() {
 	logger, err := logger.NewWrappedLogger(logger.GetLoggerConfig())
 	if err != nil {
@@ -26,13 +26,13 @@ func main() {
 	}
 
 	var cfg authCfg.Config
-	err = config.LoadConfig(&cfg, config.GetConfigPath("auth", os.Getenv("config-auth")))
+	err = config.LoadConfig(&cfg, config.GetConfigPath("auth", os.Getenv("config-file")))
 	if err != nil {
 		logger.Fatal(err)
 	}
 
 	db, err := postgres.NewPsqlDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
-		cfg.DB.DbName, cfg.DB.Password, cfg.DB.Driver)
+		cfg.DB.DBName, cfg.DB.Password, cfg.DB.Driver)
 	if err != nil {
 		logger.Fatal("Postgres connection failed:", err)
 	}

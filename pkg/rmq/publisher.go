@@ -2,7 +2,7 @@ package rmq
 
 import "github.com/streadway/amqp"
 
-// RMQ constants
+// RMQ constants.
 const (
 	JSONContentType  = "application/json"
 	PlainContentType = "text/plain"

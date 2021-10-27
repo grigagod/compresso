@@ -1,3 +1,4 @@
+// Package utils provides helper functions.
 package utils
 
 import (
@@ -19,37 +20,42 @@ func StructScan(r *http.Request, model interface{}) error {
 }
 
 // RespondWithError responds with plain text error and given code.
-func RespondWithError(w http.ResponseWriter, code int, msg string) {
+func RespondWithError(w http.ResponseWriter, code int, msg string) error {
 	w.Header().Set("Content-type", "text/plain; charset=utf-8")
 	w.WriteHeader(code)
-	w.Write([]byte(msg))
+	_, err := w.Write([]byte(msg))
+
+	return err
 }
 
 // RespondWithJSON marshal(into json) model and responds with given code.
-func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) {
+func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) error {
 	resp, err := json.Marshal(model)
 
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return RespondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(resp)
+	_, err = w.Write(resp)
+
+	return err
 }
 
-var allowedVideoContentTypes = map[string]converter.VideoFormat{
+var AllowedVideoContentTypes = map[string]converter.VideoFormat{
 	"video/x-matroska": converter.MKV,
 	"video/webm":       converter.WebM,
 }
 
-var allowedVideoFormats = map[string]converter.VideoFormat{
+var AllowedVideoFormats = map[string]converter.VideoFormat{
 	"matroska": converter.MKV,
 	"webm":     converter.WebM,
 }
 
+// DetectVideoFormatFromHeader detect converter.VideoFormat from header.
 func DetectVideoFormatFromHeader(header string) (converter.VideoFormat, error) {
-	f, ok := allowedVideoContentTypes[header]
+	f, ok := AllowedVideoContentTypes[header]
 	if !ok {
 		return converter.VideoFormat(""), errors.New("this content type is not allowed")
 	}
@@ -57,8 +63,9 @@ func DetectVideoFormatFromHeader(header string) (converter.VideoFormat, error) {
 	return f, nil
 }
 
+// DetectVideoFormat detect converter.VideoFormat from string.
 func DetectVideoFormat(format string) (converter.VideoFormat, error) {
-	f, ok := allowedVideoFormats[format]
+	f, ok := AllowedVideoFormats[format]
 	if !ok {
 		return converter.VideoFormat(""), errors.New("this content type is not allowed")
 	}

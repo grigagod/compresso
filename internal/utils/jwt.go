@@ -18,7 +18,7 @@ type Claims struct {
 }
 
 // GenerateJWTToken generates new JWT Token with claims, which includes the id and expiry time.
-func GenerateJWTToken(id uuid.UUID, expires time.Duration, JwtSecretKey string) (string, error) {
+func GenerateJWTToken(id uuid.UUID, expires time.Duration, jwtSecretKey string) (string, error) {
 	// Register the JWT claims, which includes the id and expiry time
 	claims := &Claims{
 		ID: id,
@@ -31,7 +31,7 @@ func GenerateJWTToken(id uuid.UUID, expires time.Duration, JwtSecretKey string) 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Register the JWT string
-	tokenString, err := token.SignedString([]byte(JwtSecretKey))
+	tokenString, err := token.SignedString([]byte(jwtSecretKey))
 	if err != nil {
 		return "", err
 	}

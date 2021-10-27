@@ -1,3 +1,4 @@
+// Package httpserver implements http server skeleton.
 package httpserver
 
 import (
@@ -12,7 +13,7 @@ import (
 	"github.com/grigagod/compresso/pkg/logger"
 )
 
-// ListenAndServe starts http server and gracefully stops it
+// ListenAndServe starts http server and gracefully stops it.
 func ListenAndServe(cfg *Config, router *chi.Mux, log logger.Logger) {
 	if cfg.Pprof {
 		MapPprofHandler(router)
@@ -39,7 +40,7 @@ func ListenAndServe(cfg *Config, router *chi.Mux, log logger.Logger) {
 	go func() {
 		log.Infof("Server is listening on Addr: %s", cfg.Addr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Error starting Server: ", err)
+			log.Errorf("Error starting Server: ", err)
 		}
 	}()
 
@@ -54,8 +55,7 @@ func ListenAndServe(cfg *Config, router *chi.Mux, log logger.Logger) {
 	}()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatalf("Server Shutdown Failed: %+v", err)
-
+		log.Errorf("Server Shutdown Failed: %+v", err)
 	}
 
 	log.Infof("Server Exited Properly")

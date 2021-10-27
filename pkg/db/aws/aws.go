@@ -1,3 +1,4 @@
+// Package aws provides connection to AWS S3 service.
 package aws
 
 import (
@@ -7,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 )
 
-// NewClient create new S3 client with static credentials.
+// NewClientWithStaticCredentials create new S3 client with static credentials.
 func NewClientWithStaticCredentials(region, acccessKeyID, secretAccessKey string) (*s3.S3, error) {
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(region),

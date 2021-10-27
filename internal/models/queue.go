@@ -5,6 +5,7 @@ import (
 	"github.com/grigagod/compresso/pkg/converter"
 )
 
+// QueueVideoMsg represent message that's used in broker for async video processing.
 type QueueVideoMsg struct {
 	TicketID     uuid.UUID
 	CRF          int

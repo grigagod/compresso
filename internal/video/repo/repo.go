@@ -48,7 +48,6 @@ func (r *VideoRepo) CreateTicket(ctx context.Context, ticket *models.VideoTicket
 		&ticket.State, &ticket.CRF, &ticket.URL).StructScan(&t)
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoRepo.Create.StructScan")
-
 	}
 
 	return &t, nil

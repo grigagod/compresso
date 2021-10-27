@@ -19,7 +19,9 @@ func (u *User) HashPassword() error {
 	if err != nil {
 		return err
 	}
+
 	u.Password = string(hashedPassword)
+
 	return nil
 }
 

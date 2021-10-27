@@ -8,6 +8,7 @@ import (
 	"io"
 )
 
+// Package defined errors for image processing.
 var (
 	ErrDecodeImage    = errors.New("can't decode image")
 	ErrEncodeImage    = errors.New("can't encode image")
@@ -15,7 +16,7 @@ var (
 	ErrImageConvesion = errors.New("unsupported image conversion")
 )
 
-// Global encoder to reuse buffer pool
+// Global encoder to reuse buffer pool.
 var pngEnc png.Encoder
 
 // ProcessImage process image from source with given options.

@@ -13,7 +13,7 @@ import (
 type VideoServer struct {
 	cfg       *config.APIsvc
 	Router    *chi.Mux
-	Db        *sqlx.DB
+	DB        *sqlx.DB
 	Storage   storage.Storage
 	Publisher *rmq.Publisher
 	Log       logger.Logger
@@ -23,7 +23,7 @@ func NewVideoServer(cfg *config.APIsvc, db *sqlx.DB, storage storage.Storage, pu
 	return &VideoServer{
 		cfg:       cfg,
 		Router:    chi.NewMux(),
-		Db:        db,
+		DB:        db,
 		Storage:   storage,
 		Publisher: publisher,
 		Log:       log,

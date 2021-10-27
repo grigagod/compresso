@@ -1,3 +1,4 @@
+// Package usecase implements video service usecases.
 package usecase
 
 import (
@@ -7,9 +8,9 @@ import (
 
 	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/internal/storage"
+	"github.com/grigagod/compresso/internal/utils"
 	"github.com/grigagod/compresso/internal/video"
 	"github.com/grigagod/compresso/pkg/rmq"
-	"github.com/grigagod/compresso/pkg/utils"
 	"github.com/pkg/errors"
 	"github.com/streadway/amqp"
 )
@@ -33,7 +34,13 @@ func NewVideoUseCase(qwCfg *rmq.QueueWriteConfig, repo video.Repository, storage
 
 // UploadVideo upload video to the storage and make DB insert.
 func (u *VideoUseCase) UploadVideo(ctx context.Context, video *models.Video, file io.Reader) (*models.Video, error) {
-	err := u.storage.PutObject(ctx, file, video.URL)
+	url, err := utils.GenerateURL(video.AuthorID, video.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "VideoUseCase.UploadVideo.GenerateURL")
+	}
+	video.URL = url
+
+	err = u.storage.PutObject(ctx, file, video.URL)
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.UploadVideo.PutObject")
 	}
@@ -43,20 +50,26 @@ func (u *VideoUseCase) UploadVideo(ctx context.Context, video *models.Video, fil
 		return nil, errors.Wrap(err, "VideoUseCase.UploadVideo.CreateVideo")
 	}
 
-	url, err := u.storage.GetDownloadURL(v.URL)
+	url, err = u.storage.GetDownloadURL(v.URL)
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.UploadVideo.GetDownloadURL")
 	}
+
 	v.URL = url
 
 	return v, nil
 }
 
-// CreateTicket find video in db, send message for processing to the brocker and update DB.
+// CreateTicket find video in db, send message for processing to the broker and update DB.
 func (u *VideoUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTicket) (*models.VideoTicket, error) {
 	video, err := u.repo.FindVideoByID(ctx, ticket.VideoID)
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.CreateTicket.FindVideoByID")
+	}
+
+	url, err := utils.GenerateURL(video.AuthorID, ticket.ID)
+	if err != nil {
+		return nil, errors.Wrap(err, "VideoUseCase.CreateTicket.GenerateURL")
 	}
 
 	msg := &models.QueueVideoMsg{
@@ -64,7 +77,7 @@ func (u *VideoUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTic
 		CRF:          ticket.CRF,
 		TargetFormat: ticket.TargetFormat,
 		OriginURL:    video.URL,
-		ProcessedURL: utils.GenerateURL(video.AuthorID, ticket.ID),
+		ProcessedURL: url,
 	}
 
 	body, err := json.Marshal(msg)
@@ -86,6 +99,7 @@ func (u *VideoUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTic
 	if err != nil {
 		ticket.State = models.Failed
 		_, err := u.repo.UpdateTicket(ctx, ticket)
+
 		return nil, errors.Wrap(err, "VideoUseCase.CreateTicket.Send")
 	}
 
