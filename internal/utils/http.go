@@ -20,23 +20,27 @@ func StructScan(r *http.Request, model interface{}) error {
 }
 
 // RespondWithError responds with plain text error and given code.
-func RespondWithError(w http.ResponseWriter, code int, msg string) {
+func RespondWithError(w http.ResponseWriter, code int, msg string) error {
 	w.Header().Set("Content-type", "text/plain; charset=utf-8")
 	w.WriteHeader(code)
-	w.Write([]byte(msg))
+	_, err := w.Write([]byte(msg))
+
+	return err
 }
 
 // RespondWithJSON marshal(into json) model and responds with given code.
-func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) {
+func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) error {
 	resp, err := json.Marshal(model)
 
 	if err != nil {
-		RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return RespondWithError(w, http.StatusInternalServerError, err.Error())
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
-	w.Write(resp)
+	_, err = w.Write(resp)
+
+	return err
 }
 
 var AllowedVideoContentTypes = map[string]converter.VideoFormat{
@@ -49,7 +53,7 @@ var AllowedVideoFormats = map[string]converter.VideoFormat{
 	"webm":     converter.WebM,
 }
 
-// DetectVideoFormat detect converter.VideoFormat from header.
+// DetectVideoFormatFromHeader detect converter.VideoFormat from header.
 func DetectVideoFormatFromHeader(header string) (converter.VideoFormat, error) {
 	f, ok := AllowedVideoContentTypes[header]
 	if !ok {

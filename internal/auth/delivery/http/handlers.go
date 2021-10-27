@@ -53,13 +53,11 @@ func (h *authHandlers) Register() http.Handler {
 			Password:  req.Password,
 			CreatedAt: time.Now(),
 		})
-
 		if err != nil {
 			return err
 		}
 
-		utils.RespondWithJSON(w, http.StatusCreated, user)
-		return nil
+		return utils.RespondWithJSON(w, http.StatusCreated, user)
 	}
 
 	return httper.HandlerWithError(fn)
@@ -92,8 +90,7 @@ func (h *authHandlers) Login() http.Handler {
 			return err
 		}
 
-		utils.RespondWithJSON(w, http.StatusOK, user)
-		return nil
+		return utils.RespondWithJSON(w, http.StatusOK, user)
 	}
 
 	return httper.HandlerWithError(fn)
