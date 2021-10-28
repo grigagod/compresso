@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 )
 
@@ -51,11 +51,7 @@ func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*Claims, error
 	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(jwtSecretKey), nil
 	})
-
 	if err != nil {
-		if errors.Is(err, jwt.ErrSignatureInvalid) {
-			return nil, errors.New("invalid token signature")
-		}
 		return nil, err
 	}
 

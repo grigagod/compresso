@@ -48,6 +48,8 @@ var AllowedVideoContentTypes = map[string]converter.VideoFormat{
 	"video/webm":       converter.WebM,
 }
 
+var AllowedContentTypes = []string{"video/x-matroska", "video/webm", "application/json"}
+
 var AllowedVideoFormats = map[string]converter.VideoFormat{
 	"matroska": converter.MKV,
 	"webm":     converter.WebM,

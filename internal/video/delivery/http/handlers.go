@@ -26,7 +26,9 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID := r.Context().Value(middleware.UserIDCtxKey{}).(uuid.UUID)
 
-		format, err := utils.DetectVideoFormatFromHeader(r.Header["Content-Type"][0])
+		contentType := r.Context().Value(middleware.ContentTypeCtxKey{}).(string)
+
+		format, err := utils.DetectVideoFormatFromHeader(contentType)
 		if err != nil {
 			return httper.NewBadRequestMsg(httper.NotAllowedMediaTypeMsg)
 		}
