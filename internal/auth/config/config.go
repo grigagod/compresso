@@ -12,7 +12,7 @@ const HTTPConfigPrefix = "AUTH"
 // Auth stores jwt config.
 type Auth struct {
 	JwtSecretKey string        `split_words:"true"`
-	JwtExpires   time.Duration `split_words:"true"`
+	JwtExpires   time.Duration `split_words:"true" default:"15m"`
 }
 
 func GetAuthConfigFromEnv() (*Auth, error) {

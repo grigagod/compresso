@@ -3,6 +3,7 @@ package httpserver
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,7 +25,7 @@ func ListenAndServe(cfg *Config, router *chi.Mux, log logger.Logger) {
 	}
 
 	srv := http.Server{
-		Addr:         cfg.Addr,
+		Addr:         fmt.Sprintf(":%s", cfg.Addr),
 		WriteTimeout: cfg.WriteTimeout,
 		ReadTimeout:  cfg.ReadTimeout,
 		IdleTimeout:  cfg.IdleTimeout,

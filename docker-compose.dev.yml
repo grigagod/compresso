@@ -1,0 +1,80 @@
+version: "3.8"
+
+services:
+  auth:
+    build:
+      context: ./
+      dockerfile: docker/auth/Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - .env.dev
+    networks:
+      - dev_svc
+
+  videoapi:
+    build:
+      context: ./
+      dockerfile: docker/videoapi/Dockerfile
+    ports:
+      - "5001:5001"
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - .env.dev
+    networks:
+      - dev_svc
+
+  videosvc:
+    build:
+      context: ./
+      dockerfile: docker/videosvc/Dockerfile
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - .env.dev
+    networks:
+      - dev_svc
+
+  postgresql:
+    image: postgres:12-alpine
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - ${HOME}/pgdata/:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=121073
+      - POSTGRES_DB=compresso
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 1s
+    networks:
+      - dev_svc
+
+  rabbitmq3:
+    image: rabbitmq:3-management
+    ports:
+      # AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+    networks:
+      - dev_svc
+
+
+networks:
+  dev_svc:
+    driver: bridge
