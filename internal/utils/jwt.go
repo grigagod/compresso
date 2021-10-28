@@ -13,17 +13,17 @@ import (
 
 // Claims holds jwt claims.
 type Claims struct {
-	ID uuid.UUID `json:"id"`
-	jwt.StandardClaims
+	UserID uuid.UUID `json:"user_id"`
+	jwt.RegisteredClaims
 }
 
 // GenerateJWTToken generates new JWT Token with claims, which includes the id and expiry time.
 func GenerateJWTToken(id uuid.UUID, expires time.Duration, jwtSecretKey string) (string, error) {
 	// Register the JWT claims, which includes the id and expiry time
 	claims := &Claims{
-		ID: id,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(expires).Unix(),
+		UserID: id,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(expires)},
 		},
 	}
 
