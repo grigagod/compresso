@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/grigagod/compresso/internal/httper"
@@ -18,8 +19,8 @@ func JWTAuth(jwtSecretKey string) func(next http.Handler) http.Handler {
 			if err != nil {
 				return httper.ParseJWTError(err)
 			}
-
-			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserIDCtxKey{}, claims.UserID)))
+			log.Printf("ID: %s", claims.ID)
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserIDCtxKey{}, claims.ID)))
 
 			return nil
 		}

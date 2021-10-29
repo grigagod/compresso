@@ -3,6 +3,8 @@ FROM golang:1.17-alpine AS builder
 # Move to working directory (/videosvc).
 WORKDIR /videosvc
 
+RUN apk add -U --no-cache ca-certificates
+
 # Copy the code into the container and download dependency.
 COPY . .
 RUN go mod download
@@ -16,6 +18,7 @@ FROM jrottenberg/ffmpeg:3-scratch
 # Copy binary file from /videosvc to root folder of scratch container.
 COPY --from=builder ["/videosvc/videosvcbin", "/"]
 
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 # Command to run when starting the container.
 ENTRYPOINT ["/videosvcbin"]

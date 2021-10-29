@@ -37,6 +37,14 @@ func NewBadRequestMsg(msg ErrMessage) StatusError {
 	return NewStatusMsg(http.StatusBadRequest, msg)
 }
 
+func NewUnauthorizedError(err error) StatusError {
+	return NewStatusError(http.StatusUnauthorized, err)
+}
+
+func NewUnauthorizedMsg(msg ErrMessage) StatusError {
+	return NewStatusMsg(http.StatusUnauthorized, msg)
+}
+
 func (st StatusError) Error() string {
 	return st.Err.Error()
 }

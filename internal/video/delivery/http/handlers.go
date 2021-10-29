@@ -24,9 +24,15 @@ func NewVideoHandlers(videoUC video.UseCase) video.Handlers {
 
 func (h *videoHandlers) UploadVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
-		userID := r.Context().Value(middleware.UserIDCtxKey{}).(uuid.UUID)
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+		}
 
-		contentType := r.Context().Value(middleware.ContentTypeCtxKey{}).(string)
+		contentType, ok := r.Context().Value(middleware.ContentTypeCtxKey{}).(string)
+		if !ok {
+			return httper.NewBadRequestMsg(httper.NotAllowedHeaderMsg)
+		}
 
 		format, err := utils.DetectVideoFormatFromHeader(contentType)
 		if err != nil {
@@ -44,7 +50,7 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 			return err
 		}
 
-		return utils.RespondWithJSON(w, http.StatusCreated, &v)
+		return utils.RespondWithJSON(w, http.StatusCreated, v)
 	}
 
 	return httper.HandlerWithError(fn)
@@ -52,7 +58,10 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 
 func (h *videoHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
-		userId := r.Context().Value(middleware.UserIDCtxKey{}).(uuid.UUID)
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+		}
 
 		var req CreateTicketRequest
 
@@ -60,7 +69,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 			return httper.NewBadRequestError(err)
 		}
 
-		err := utils.ValidateStruct(&req)
+		err = utils.ValidateStruct(&req)
 		if err != nil {
 			return httper.ParseValidatorError(err)
 		}
@@ -78,7 +87,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 		ticket := models.VideoTicket{
 			Ticket: models.Ticket{
 				ID:       uuid.New(),
-				AuthorID: userId,
+				AuthorID: userID,
 			},
 			VideoID:      req.VideoID,
 			CRF:          req.CRF,
@@ -90,7 +99,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 			return err
 		}
 
-		return utils.RespondWithJSON(w, http.StatusCreated, &t)
+		return utils.RespondWithJSON(w, http.StatusCreated, t)
 	}
 
 	return httper.HandlerWithError(fn)

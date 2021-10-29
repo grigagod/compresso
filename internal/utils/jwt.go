@@ -9,22 +9,15 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/grigagod/compresso/internal/httper"
 )
-
-// Claims holds jwt claims.
-type Claims struct {
-	UserID uuid.UUID `json:"user_id"`
-	jwt.RegisteredClaims
-}
 
 // GenerateJWTToken generates new JWT Token with claims, which includes the id and expiry time.
 func GenerateJWTToken(id uuid.UUID, expires time.Duration, jwtSecretKey string) (string, error) {
 	// Register the JWT claims, which includes the id and expiry time
-	claims := &Claims{
-		UserID: id,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(expires)},
-		},
+	claims := &jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(expires)),
+		ID:        id.String(),
 	}
 
 	// Declare the token with the algorithm used for signing, and the claims
@@ -40,7 +33,7 @@ func GenerateJWTToken(id uuid.UUID, expires time.Duration, jwtSecretKey string) 
 }
 
 // ExtractJWTFromRequest extracts JWT claims form request.
-func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*Claims, error) {
+func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*jwt.RegisteredClaims, error) {
 	// Get the JWT string
 	tokenString, err := ExtractBearerToken(r)
 	if err != nil {
@@ -48,7 +41,10 @@ func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*Claims, error
 	}
 
 	// Parse the JWT string
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, httper.NewUnauthorizedMsg(httper.UnexpectedSignatureMsg)
+		}
 		return []byte(jwtSecretKey), nil
 	})
 	if err != nil {
@@ -56,12 +52,12 @@ func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*Claims, error
 	}
 
 	if !token.Valid {
-		return nil, errors.New("invalid token")
+		return nil, httper.NewUnauthorizedMsg(httper.InvalidTokenMsg)
 	}
 
-	claims, ok := token.Claims.(*Claims)
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
-		return nil, errors.New("invalid token")
+		return nil, httper.NewUnauthorizedMsg(httper.InvalidTokenMsg)
 	}
 
 	return claims, nil

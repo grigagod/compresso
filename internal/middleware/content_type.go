@@ -28,7 +28,7 @@ func ContentType(contentTypes ...string) func(next http.Handler) http.Handler {
 			}
 
 			if _, ok := allowedContentTypes[s]; ok {
-				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserIDCtxKey{}, s)))
+				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ContentTypeCtxKey{}, s)))
 				return
 			}
 
