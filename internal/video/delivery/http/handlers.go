@@ -23,6 +23,18 @@ func NewVideoHandlers(videoUC video.UseCase) video.Handlers {
 	}
 }
 
+// Register godoc
+// @Summary Create new video
+// @Description Authorized users can upload their videos
+// @Tags Video
+// @Accept video/webm
+// @Produce json
+// @Success 201 {object} models.Video
+// @Failure 401 {string} msg "Wrong creadentials"
+// @Failure 409 {string} msg "Provided header is not allowed"
+// @Failure 409 {string} msg "Provided media type is not allowed"
+// @Security ApiKeyAuth
+// @Router /videos [post]
 func (h *videoHandlers) CreateVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -57,6 +69,19 @@ func (h *videoHandlers) CreateVideo() http.Handler {
 	return httper.HandlerWithError(fn)
 }
 
+// Register godoc
+// @Summary Create new video ticket
+// @Description Authorized users can create tickets for processing uploaded videos
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Param req body CreateTicketRequest true "info for video processing"
+// @Success 201 {object} models.VideoTicket
+// @Failure 401 {string} msg "Wrong creadentials"
+// @Failure 409 {string} msg "Provided header is not allowed"
+// @Failure 409 {string} msg "Provided media type is not allowed"
+// @Security ApiKeyAuth
+// @Router /tickets [post]
 func (h *videoHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -106,6 +131,20 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 	return httper.HandlerWithError(fn)
 }
 
+// Register godoc
+// @Summary Get video by ID
+// @Description Authorized users can get uploaded videos by ID.
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Param id path string true "Video ID"
+// @Success 201 {object} models.Video
+// @Failure 401 {string} msg "Wrong creadentials"
+// @Failure 409 {string} msg "Provided header is not allowed"
+// @Failure 409 {string} msg "Provided media type is not allowed"
+// @Failure 409 {string} msg "Bad request"
+// @Security ApiKeyAuth
+// @Router /videos/{id} [get]
 func (h *videoHandlers) GetVideoByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -129,6 +168,20 @@ func (h *videoHandlers) GetVideoByID() http.Handler {
 	return httper.HandlerWithError(fn)
 }
 
+// Register godoc
+// @Summary Get video by ID
+// @Description Authorized users can get uploaded videos by ID.
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Param id path string true "Video ID"
+// @Success 201 {object} models.Video
+// @Failure 401 {string} msg "Wrong creadentials"
+// @Failure 409 {string} msg "Provided header is not allowed"
+// @Failure 409 {string} msg "Provided media type is not allowed"
+// @Failure 409 {string} msg "Bad request"
+// @Security ApiKeyAuth
+// @Router /tickets/{id} [get]
 func (h *videoHandlers) GetTicketByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -152,6 +205,19 @@ func (h *videoHandlers) GetTicketByID() http.Handler {
 	return httper.HandlerWithError(fn)
 }
 
+// Register godoc
+// @Summary Get videos
+// @Description Authorized users can get all uploaded videos.
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Success 201 {object} []models.Video
+// @Failure 401 {string} msg "Wrong creadentials"
+// @Failure 409 {string} msg "Provided header is not allowed"
+// @Failure 409 {string} msg "Provided media type is not allowed"
+// @Failure 409 {string} msg "Bad request"
+// @Security ApiKeyAuth
+// @Router /videos [get]
 func (h *videoHandlers) GetVideos() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -170,6 +236,19 @@ func (h *videoHandlers) GetVideos() http.Handler {
 	return httper.HandlerWithError(fn)
 }
 
+// Register godoc
+// @Summary Get tickets
+// @Description Authorized users can get all video tickets.
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Success 201 {object} []models.VideoTicket
+// @Failure 401 {string} msg "Wrong creadentials"
+// @Failure 409 {string} msg "Provided header is not allowed"
+// @Failure 409 {string} msg "Provided media type is not allowed"
+// @Failure 409 {string} msg "Bad request"
+// @Security ApiKeyAuth
+// @Router /tickets [get]
 func (h *videoHandlers) GetTickets() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))

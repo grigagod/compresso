@@ -1,4 +1,4 @@
-.PHONY: test local lint migrate prune dev
+.PHONY: test local lint migrate prune dev swag
 
 BUILD_DIR = $(PWD)/build
 MIGRATIONS= $(PWD)/migrations/
@@ -11,6 +11,10 @@ test:
 
 lint:
 	golangci-lint run ./...
+
+swag:
+	swag init -g cmd/auth/main.go -o docs/auth --exclude internal/video
+	swag init -g cmd/videoapi/main.go -o docs/videoapi --exclude internal/auth
 
 # ==============================================================================
 # MIGRATIONS

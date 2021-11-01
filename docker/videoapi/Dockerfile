@@ -17,7 +17,7 @@ FROM scratch
 
 # Copy binary and documentation files from /videoapi to root folder of scratch container.
 COPY --from=builder ["/videoapi/videoapibin", "/"]
-#COPY --from=builder ["/videoapi/docs/videoapi/", "/docs/videoapi/"]
+COPY --from=builder ["/videoapi/docs/videoapi/", "/docs/videoapi/"]
 
 # Copy certificates
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
