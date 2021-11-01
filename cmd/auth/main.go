@@ -2,11 +2,9 @@ package main
 
 import (
 	"log"
-	"os"
 
-	authCfg "github.com/grigagod/compresso/internal/auth/config"
+	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/auth/server"
-	"github.com/grigagod/compresso/internal/config"
 	"github.com/grigagod/compresso/pkg/db/postgres"
 	"github.com/grigagod/compresso/pkg/logger"
 
@@ -25,20 +23,29 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var cfg authCfg.Config
-	err = config.LoadConfig(&cfg, config.GetConfigPath("auth", os.Getenv("config-file")))
+	httpCfg, err := config.GetHTTPConfigFromEnv()
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	db, err := postgres.NewPsqlDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
-		cfg.DB.DBName, cfg.DB.Password, cfg.DB.Driver)
+	dbCfg, err := postgres.GetConfigFromEnv()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	authCfg, err := config.GetAuthConfigFromEnv()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	db, err := postgres.NewPsqlDB(dbCfg.URL, dbCfg.Driver, dbCfg.MaxOpenConns,
+		dbCfg.MaxIdleConns, dbCfg.ConnMaxLifetime, dbCfg.ConnMaxIdleTime)
 	if err != nil {
 		logger.Fatal("Postgres connection failed:", err)
 	}
 	defer db.Close()
 
-	s := server.NewAuthServer(&cfg.Auth, db, logger)
+	s := server.NewAuthServer(authCfg, db, logger)
 	s.MapHandlers()
-	s.ListenAndServe(&cfg.HTTP)
+	s.ListenAndServe(httpCfg)
 }

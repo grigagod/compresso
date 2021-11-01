@@ -4,18 +4,25 @@ import (
 	"time"
 
 	"github.com/grigagod/compresso/internal/httpserver"
-	"github.com/grigagod/compresso/pkg/db/postgres"
+	"github.com/kelseyhightower/envconfig"
 )
 
-// Config stores auth service config.
-type Config struct {
-	HTTP httpserver.Config
-	DB   postgres.Config
-	Auth
-}
+const HTTPConfigPrefix = "AUTH"
 
 // Auth stores jwt config.
 type Auth struct {
-	JwtSecretKey string
-	JwtExpires   time.Duration
+	JwtSecretKey string        `split_words:"true"`
+	JwtExpires   time.Duration `split_words:"true" default:"15m"`
+}
+
+func GetAuthConfigFromEnv() (*Auth, error) {
+	c := new(Auth)
+	err := envconfig.Process("", c)
+	return c, err
+}
+
+func GetHTTPConfigFromEnv() (*httpserver.Config, error) {
+	c := new(httpserver.Config)
+	err := envconfig.Process(HTTPConfigPrefix, c)
+	return c, err
 }

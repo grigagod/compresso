@@ -1,4 +1,4 @@
-FROM golang:1.16-alpine AS builder
+FROM golang:1.17-alpine AS builder
 
 # Move to working directory (/auth).
 WORKDIR /auth
@@ -12,12 +12,9 @@ RUN go build -ldflags="-s -w" -o authbin cmd/auth/main.go
 
 FROM scratch
 
-# Copy binary and config files from /auth to root folder of scratch container.
+# Copy binary and documentation files from /auth to root folder of scratch container.
 COPY --from=builder ["/auth/authbin", "/"]
 COPY --from=builder ["/auth/docs/auth/", "/docs/auth/"]
-COPY --from=builder ["/auth/configs/auth/", "/configs/auth/"]
-
-ENV config-file=prod
 
 # Export necessary port.
 EXPOSE 5000

@@ -18,7 +18,6 @@ func JWTAuth(jwtSecretKey string) func(next http.Handler) http.Handler {
 			if err != nil {
 				return httper.ParseJWTError(err)
 			}
-
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), UserIDCtxKey{}, claims.ID)))
 
 			return nil

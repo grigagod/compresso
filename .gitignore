@@ -5,8 +5,8 @@
 build/
 
 # AWS credentials
-.aws/
+.aws
 
-# Production configs
-*prod.*
-.env
+# Sectret configs
+.env.prod
+.env.dev

@@ -5,7 +5,6 @@ import (
 	"context"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
@@ -17,11 +16,10 @@ import (
 )
 
 func TestAWSStorage_BasicOperations(t *testing.T) {
-	client, err := aws.NewClientWithStaticCredentials(os.Getenv("AWS_REGION"),
-		os.Getenv("AWS_ACCESS_KEY_ID"), os.Getenv("AWS_SECRET_ACCESS_KEY"))
+	client, err := aws.NewClientWithEnvCredentials()
 	assert.NoError(t, err)
 
-	cfg := Config{
+	cfg := &Config{
 		Bucket:          "compresso-test",
 		PresignDuration: 1 * time.Second,
 	}

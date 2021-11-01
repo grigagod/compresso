@@ -13,7 +13,7 @@ services:
       - POSTGRES_PASSWORD=121073
       - POSTGRES_DB=compresso
     networks:
-      - web_api
+      - local_svc
 
   rabbitmq3:
     image: rabbitmq:3-management
@@ -22,7 +22,9 @@ services:
       - '5672:5672'
       # HTTP management UI
       - '15672:15672'
+    networks:
+      - local_svc
 
 networks:
-  web_api:
+  local_svc:
     driver: bridge

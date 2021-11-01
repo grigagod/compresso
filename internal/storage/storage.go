@@ -18,13 +18,13 @@ type Storage interface {
 
 // AWSStorage imlements Storage interface.
 type AWSStorage struct {
-	cfg      Config
+	cfg      *Config
 	client   *s3.S3
 	uploader *s3manager.Uploader
 }
 
 // NewAWSStorage create new AWSStorage with given config and S3 client.
-func NewAWSStorage(cfg Config, client *s3.S3) *AWSStorage {
+func NewAWSStorage(cfg *Config, client *s3.S3) *AWSStorage {
 	return &AWSStorage{
 		cfg:      cfg,
 		client:   client,

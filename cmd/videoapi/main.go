@@ -2,11 +2,9 @@ package main
 
 import (
 	"log"
-	"os"
 
-	"github.com/grigagod/compresso/internal/config"
 	"github.com/grigagod/compresso/internal/storage"
-	videoCfg "github.com/grigagod/compresso/internal/video/config"
+	"github.com/grigagod/compresso/internal/video/config"
 	"github.com/grigagod/compresso/internal/video/server"
 	"github.com/grigagod/compresso/pkg/db/aws"
 	"github.com/grigagod/compresso/pkg/db/postgres"
@@ -20,35 +18,54 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var cfg videoCfg.API
-	err = config.LoadConfig(&cfg, config.GetConfigPath("videoapi", os.Getenv("config-videoapi")))
+	httpCfg, err := config.GetHTTPConfigFromEnv()
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	db, err := postgres.NewPsqlDB(cfg.DB.Host, cfg.DB.Port, cfg.DB.User,
-		cfg.DB.DBName, cfg.DB.Password, cfg.DB.Driver)
+	dbCfg, err := postgres.GetConfigFromEnv()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	storageCfg, err := storage.GetConfigFromEnv()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	rmqCfg, err := rmq.GetConfigFromEnv()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	apiCfg, err := config.GetAPIConfigFromEnv()
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	db, err := postgres.NewPsqlDB(dbCfg.URL, dbCfg.Driver, dbCfg.MaxOpenConns,
+		dbCfg.MaxIdleConns, dbCfg.ConnMaxLifetime, dbCfg.ConnMaxIdleTime)
 	if err != nil {
 		logger.Fatal("Postgres connection failed:", err)
 	}
 	defer db.Close()
 
-	s3client, err := aws.NewClientWithSharedCredentials("./.aws/credentials", "test")
+	s3client, err := aws.NewClientWithEnvCredentials()
 	if err != nil {
 		logger.Fatal("AWS S3 session failed:", err)
 	}
 
-	storage := storage.NewAWSStorage(cfg.Storage, s3client)
-	logger.Infof("AWS Bucket: %s", cfg.Storage.Bucket)
+	storage := storage.NewAWSStorage(storageCfg, s3client)
 
-	ch, err := rmq.NewChannelFromConfig(&cfg.RMQ)
+	ch, err := rmq.NewChannelFromConfig(rmqCfg)
 	if err != nil {
 		logger.Fatal("RMQ connection failed:", err)
 	}
 	defer ch.Close()
+
 	pub := rmq.NewPublisher(ch)
 
-	s := server.NewVideoServer(&cfg.APIsvc, db, storage, pub, logger)
+	s := server.NewVideoServer(apiCfg, db, storage, pub, logger)
 	s.MapHandlers()
-	s.ListenAndServe(&cfg.HTTP)
+	s.ListenAndServe(httpCfg)
 }

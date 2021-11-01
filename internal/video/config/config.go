@@ -2,30 +2,33 @@ package config
 
 import (
 	"github.com/grigagod/compresso/internal/httpserver"
-	"github.com/grigagod/compresso/internal/storage"
-	"github.com/grigagod/compresso/pkg/db/postgres"
 	"github.com/grigagod/compresso/pkg/rmq"
+	"github.com/kelseyhightower/envconfig"
 )
 
-// API stores full config for video API service(include initialization and hot used parts).
+const HTTPConfigPrefix = "VIDEO"
+
+// API stores config for video API service.
 type API struct {
-	HTTP    httpserver.Config
-	DB      postgres.Config
-	Storage storage.Config
-	RMQ     rmq.Config
-	APIsvc
+	*rmq.QueueWriteConfig `ignored:"true"`
+	JwtSecretKey          string `split_words:"true"`
 }
 
-// APIsvc stores hot used part of config for video API service.
-type APIsvc struct {
-	rmq.QueueWriteConfig
-	JwtSecretKey string
+func GetHTTPConfigFromEnv() (*httpserver.Config, error) {
+	c := new(httpserver.Config)
+	err := envconfig.Process(HTTPConfigPrefix, c)
+	return c, err
 }
 
-// Converer stores config for video converter Service.
-type Converter struct {
-	DB      postgres.Config
-	Storage storage.Config
-	RMQ     rmq.Config
-	rmq.QueueReadConfig
+func GetAPIConfigFromEnv() (*API, error) {
+	qwCfg, err := rmq.GetQueueWriteConfigFromEnv()
+	if err != nil {
+		return nil, err
+	}
+
+	c := new(API)
+	err = envconfig.Process("", c)
+	c.QueueWriteConfig = qwCfg
+
+	return c, err
 }
