@@ -34,7 +34,7 @@ func NewVideoHandlers(videoUC video.UseCase) video.Handlers {
 // @Failure 409 {string} msg "Provided header is not allowed"
 // @Failure 409 {string} msg "Provided media type is not allowed"
 // @Security ApiKeyAuth
-// @Router /videos [post]
+// @Router /videos [post].
 func (h *videoHandlers) CreateVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -81,7 +81,7 @@ func (h *videoHandlers) CreateVideo() http.Handler {
 // @Failure 409 {string} msg "Provided header is not allowed"
 // @Failure 409 {string} msg "Provided media type is not allowed"
 // @Security ApiKeyAuth
-// @Router /tickets [post]
+// @Router /tickets [post].
 func (h *videoHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -144,7 +144,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 // @Failure 409 {string} msg "Provided media type is not allowed"
 // @Failure 409 {string} msg "Bad request"
 // @Security ApiKeyAuth
-// @Router /videos/{id} [get]
+// @Router /videos/{id} [get].
 func (h *videoHandlers) GetVideoByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -181,7 +181,7 @@ func (h *videoHandlers) GetVideoByID() http.Handler {
 // @Failure 409 {string} msg "Provided media type is not allowed"
 // @Failure 409 {string} msg "Bad request"
 // @Security ApiKeyAuth
-// @Router /tickets/{id} [get]
+// @Router /tickets/{id} [get].
 func (h *videoHandlers) GetTicketByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -217,7 +217,7 @@ func (h *videoHandlers) GetTicketByID() http.Handler {
 // @Failure 409 {string} msg "Provided media type is not allowed"
 // @Failure 409 {string} msg "Bad request"
 // @Security ApiKeyAuth
-// @Router /videos [get]
+// @Router /videos [get].
 func (h *videoHandlers) GetVideos() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
@@ -248,7 +248,7 @@ func (h *videoHandlers) GetVideos() http.Handler {
 // @Failure 409 {string} msg "Provided media type is not allowed"
 // @Failure 409 {string} msg "Bad request"
 // @Security ApiKeyAuth
-// @Router /tickets [get]
+// @Router /tickets [get].
 func (h *videoHandlers) GetTickets() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))

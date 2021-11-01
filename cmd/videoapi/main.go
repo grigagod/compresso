@@ -22,7 +22,7 @@ import (
 // @contact.email podkidysh2002@gmail.com.
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
-// @name Authorization
+// @name Authorization.
 func main() {
 	logger, err := logger.NewWrappedLogger(logger.GetLoggerConfig())
 	if err != nil {
