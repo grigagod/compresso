@@ -6,6 +6,15 @@ import (
 )
 
 func MapVideoRoutes(router chi.Router, h video.Handlers) {
-	router.Method("POST", "/", h.UploadVideo())
-	router.Method("POST", "/tickets", h.CreateTicket())
+	router.Route("/videos", func(r chi.Router) {
+		r.Method("GET", "/", h.GetVideos())
+		r.Method("GET", "/{id}", h.GetVideoByID())
+		r.Method("POST", "/", h.CreateVideo())
+	})
+
+	router.Route("/tickets", func(r chi.Router) {
+		r.Method("GET", "/", h.GetTickets())
+		r.Method("GET", "/{id}", h.GetTicketByID())
+		r.Method("POST", "/", h.CreateTicket())
+	})
 }

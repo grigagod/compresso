@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/middleware"
@@ -22,7 +23,7 @@ func NewVideoHandlers(videoUC video.UseCase) video.Handlers {
 	}
 }
 
-func (h *videoHandlers) UploadVideo() http.Handler {
+func (h *videoHandlers) CreateVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
@@ -45,7 +46,7 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 			Format:   format,
 		}
 
-		v, err := h.videoUC.UploadVideo(r.Context(), &video, r.Body)
+		v, err := h.videoUC.CreateVideo(r.Context(), &video, r.Body)
 		if err != nil {
 			return err
 		}
@@ -100,6 +101,88 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 		}
 
 		return utils.RespondWithJSON(w, http.StatusCreated, t)
+	}
+
+	return httper.HandlerWithError(fn)
+}
+
+func (h *videoHandlers) GetVideoByID() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+		}
+
+		id, err := uuid.Parse(chi.URLParamFromCtx(r.Context(), "id"))
+		if err != nil {
+			return httper.NewBadRequestMsg(httper.BadRequestMsg)
+		}
+
+		video, err := h.videoUC.GetVideoByID(r.Context(), userID, id)
+		if err != nil {
+			return err
+		}
+
+		return utils.RespondWithJSON(w, http.StatusOK, video)
+	}
+
+	return httper.HandlerWithError(fn)
+}
+
+func (h *videoHandlers) GetTicketByID() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+		}
+
+		id, err := uuid.Parse(chi.URLParamFromCtx(r.Context(), "id"))
+		if err != nil {
+			return httper.NewBadRequestMsg(httper.BadRequestMsg)
+		}
+
+		ticket, err := h.videoUC.GetTicketByID(r.Context(), userID, id)
+		if err != nil {
+			return err
+		}
+
+		return utils.RespondWithJSON(w, http.StatusOK, ticket)
+	}
+
+	return httper.HandlerWithError(fn)
+}
+
+func (h *videoHandlers) GetVideos() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+		}
+
+		videos, err := h.videoUC.GetVideos(r.Context(), userID)
+		if err != nil {
+			return err
+		}
+
+		return utils.RespondWithJSON(w, http.StatusOK, videos)
+	}
+
+	return httper.HandlerWithError(fn)
+}
+
+func (h *videoHandlers) GetTickets() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+		}
+
+		tickets, err := h.videoUC.GetTickets(r.Context(), userID)
+		if err != nil {
+			return err
+		}
+
+		return utils.RespondWithJSON(w, http.StatusOK, tickets)
 	}
 
 	return httper.HandlerWithError(fn)

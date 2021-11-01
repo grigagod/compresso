@@ -90,7 +90,7 @@ func (r *VideoRepo) SelectVideoByID(ctx context.Context, authorID uuid.UUID, id 
 
 // SelectTicketByID select by ID video ticket model from DB.
 func (r *VideoRepo) SelectTicketByID(ctx context.Context, authorID, id uuid.UUID) (*models.VideoTicket, error) {
-	query := `SELECT * FROM svc.video_tickets WHERE authorID =$1 AND ticket_id = $2`
+	query := `SELECT * FROM svc.video_tickets WHERE author_id =$1 AND ticket_id = $2`
 
 	var t models.VideoTicket
 
@@ -107,7 +107,7 @@ func (r *VideoRepo) SelectVideos(ctx context.Context, authorID uuid.UUID) ([]*mo
 	query := `SELECT * FROM svc.user_videos WHERE author_id = $1`
 	var videos []*models.Video
 
-	err := r.db.SelectContext(ctx, videos, query, authorID)
+	err := r.db.SelectContext(ctx, &videos, query, authorID)
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoRepo.SelectVideos.SelectContext")
 	}
@@ -120,7 +120,7 @@ func (r *VideoRepo) SelectTickets(ctx context.Context, authorID uuid.UUID) ([]*m
 	query := `SELECT * FROM svc.video_tickets WHERE author_id = $1`
 	var tickets []*models.VideoTicket
 
-	err := r.db.SelectContext(ctx, tickets, query, authorID)
+	err := r.db.SelectContext(ctx, &tickets, query, authorID)
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoRepo.SelectTickets.SelectContext")
 	}
