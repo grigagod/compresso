@@ -32,7 +32,7 @@ func ParseSqlError(err error) Error {
 	}
 
 	if errors.Is(err, sql.ErrNoRows) {
-		return NewBadRequestMsg(UserNotFoundMsg)
+		return NewStatusMsg(http.StatusNotFound, NotFoundMsg)
 	}
 
 	return NewBadRequestError(err)
