@@ -7,6 +7,7 @@ import (
 	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/utils"
+	"github.com/pkg/errors"
 )
 
 type AuthUseCase struct {
@@ -19,25 +20,25 @@ func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) *AuthUseCase {
 }
 
 func (u *AuthUseCase) Register(ctx context.Context, user *auth.User) (*auth.UserWithToken, error) {
-	existsUser, err := u.authRepo.FindByName(ctx, user.Username)
+	existsUser, err := u.authRepo.GetUserByName(ctx, user.Username)
 	if existsUser != nil || err == nil {
 		return nil, httper.NewBadRequestMsg(httper.UserExistsMsg)
 	}
 
 	if err = user.HashPassword(); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "AuthUseCase.Register.HashPassword")
 	}
 
-	createdUser, err := u.authRepo.Create(ctx, user)
+	createdUser, err := u.authRepo.InsertUser(ctx, user)
 	if err != nil {
-		return nil, httper.ParseSqlError(err)
+		return nil, httper.ParseSqlError(errors.Wrap(err, "AuthUseCase.Register.InsertUser"))
 	}
 
 	createdUser.SanitizePassword()
 
 	token, err := utils.GenerateJWTToken(createdUser.ID, u.cfg.JwtExpires, u.cfg.JwtSecretKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "AuthUseCase.Login.GenerateJWTToken")
 	}
 
 	return &auth.UserWithToken{
@@ -47,20 +48,20 @@ func (u *AuthUseCase) Register(ctx context.Context, user *auth.User) (*auth.User
 }
 
 func (u *AuthUseCase) Login(ctx context.Context, user *auth.User) (*auth.UserWithToken, error) {
-	foundUser, err := u.authRepo.FindByName(ctx, user.Username)
+	foundUser, err := u.authRepo.GetUserByName(ctx, user.Username)
 	if err != nil {
-		return nil, httper.ParseSqlError(err)
+		return nil, httper.ParseSqlError(errors.Wrap(err, "AuthUseCase.Login.GetUserByName"))
 	}
 
 	if err = foundUser.ComparePasswords(user.Password); err != nil {
-		return nil, httper.NewBadRequestMsg(httper.WrongCredentialsMsg)
+		return nil, httper.NewWrongCredentialsMsg()
 	}
 
 	foundUser.SanitizePassword()
 
 	token, err := utils.GenerateJWTToken(foundUser.ID, u.cfg.JwtExpires, u.cfg.JwtSecretKey)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "AuthUseCase.Login.GenerateJWTToken")
 	}
 
 	return &auth.UserWithToken{

@@ -61,18 +61,22 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             items:
               $ref: '#/definitions/models.VideoTicket'
             type: array
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
         "401":
           description: Wrong creadentials
           schema:
             type: string
-        "409":
-          description: Bad request
+        "404":
+          description: Not found
           schema:
             type: string
       security:
@@ -98,11 +102,15 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.VideoTicket'
-        "401":
-          description: Wrong creadentials
+        "400":
+          description: Bad request msg
           schema:
             type: string
-        "409":
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "415":
           description: Provided media type is not allowed
           schema:
             type: string
@@ -125,16 +133,20 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.Video'
-        "401":
-          description: Wrong creadentials
+        "400":
+          description: Bad request msg
           schema:
             type: string
-        "409":
-          description: Bad request
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "404":
+          description: Not found
           schema:
             type: string
       security:
@@ -150,18 +162,22 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             items:
               $ref: '#/definitions/models.Video'
             type: array
-        "401":
-          description: Wrong creadentials
+        "400":
+          description: Bad request msg
           schema:
             type: string
-        "409":
-          description: Bad request
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "404":
+          description: Not found
           schema:
             type: string
       security:
@@ -180,11 +196,15 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/models.Video'
-        "401":
-          description: Wrong creadentials
+        "400":
+          description: Bad request msg
           schema:
             type: string
-        "409":
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "415":
           description: Provided media type is not allowed
           schema:
             type: string
@@ -207,16 +227,20 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.Video'
-        "401":
-          description: Wrong creadentials
+        "400":
+          description: Bad request msg
           schema:
             type: string
-        "409":
-          description: Bad request
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "404":
+          description: Not found
           schema:
             type: string
       security:
@@ -227,6 +251,6 @@ paths:
 securityDefinitions:
   ApiKeyAuth:
     in: header
-    name: Authorization
+    name: Authorization.
     type: apiKey
 swagger: "2.0"

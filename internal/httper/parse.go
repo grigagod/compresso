@@ -13,14 +13,14 @@ import (
 
 func ParseValidatorError(err error) Error {
 	if strings.Contains(err.Error(), "Password") {
-		return NewStatusMsg(http.StatusBadRequest, InvalidPasswordMsg)
+		return NewBadRequestMsg(InvalidPasswordMsg)
 	}
 
 	if strings.Contains(err.Error(), "Username") {
-		return NewStatusMsg(http.StatusBadRequest, InvalidUsernameMsg)
+		return NewBadRequestMsg(InvalidUsernameMsg)
 	}
 
-	return NewStatusError(http.StatusBadRequest, err)
+	return NewBadRequestError(err)
 }
 
 func ParseSqlError(err error) Error {
@@ -46,5 +46,5 @@ func ParseJWTError(err error) Error {
 		}
 	}
 
-	return NewStatusMsg(http.StatusUnauthorized, InvalidTokenMsg)
+	return NewUnauthorizedMsg(InvalidTokenMsg)
 }

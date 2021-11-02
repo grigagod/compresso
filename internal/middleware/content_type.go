@@ -4,6 +4,8 @@ import (
 	"context"
 	"net/http"
 	"strings"
+
+	"github.com/grigagod/compresso/internal/httper"
 )
 
 type ContentTypeCtxKey struct{}
@@ -15,11 +17,11 @@ func ContentType(contentTypes ...string) func(next http.Handler) http.Handler {
 	}
 
 	return func(next http.Handler) http.Handler {
-		fn := func(w http.ResponseWriter, r *http.Request) {
+		fn := func(w http.ResponseWriter, r *http.Request) error {
 			if r.ContentLength == 0 {
 				// skip check for empty content body
 				next.ServeHTTP(w, r)
-				return
+				return nil
 			}
 
 			s := strings.ToLower(strings.TrimSpace(r.Header.Get("Content-Type")))
@@ -29,11 +31,11 @@ func ContentType(contentTypes ...string) func(next http.Handler) http.Handler {
 
 			if _, ok := allowedContentTypes[s]; ok {
 				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ContentTypeCtxKey{}, s)))
-				return
+				return nil
 			}
 
-			w.WriteHeader(http.StatusUnsupportedMediaType)
+			return httper.NewNotAllowedMediaMsg()
 		}
-		return http.HandlerFunc(fn)
+		return httper.HandlerWithError(fn)
 	}
 }

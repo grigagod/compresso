@@ -30,26 +30,26 @@ func NewVideoHandlers(videoUC video.UseCase) video.Handlers {
 // @Accept video/webm
 // @Produce json
 // @Success 201 {object} models.Video
-// @Failure 401 {string} msg "Wrong creadentials"
-// @Failure 409 {string} msg "Provided header is not allowed"
-// @Failure 409 {string} msg "Provided media type is not allowed"
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 415 {string} msg "Provided media type is not allowed"
 // @Security ApiKeyAuth
 // @Router /videos [post].
 func (h *videoHandlers) CreateVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
-			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+			return httper.NewWrongCredentialsMsg()
 		}
 
 		contentType, ok := r.Context().Value(middleware.ContentTypeCtxKey{}).(string)
 		if !ok {
-			return httper.NewBadRequestMsg(httper.NotAllowedHeaderMsg)
+			return httper.NewNotAllowedMediaMsg()
 		}
 
 		format, err := utils.DetectVideoFormatFromHeader(contentType)
 		if err != nil {
-			return httper.NewBadRequestMsg(httper.NotAllowedMediaTypeMsg)
+			return httper.NewNotAllowedMediaMsg()
 		}
 
 		video := models.Video{
@@ -77,16 +77,16 @@ func (h *videoHandlers) CreateVideo() http.Handler {
 // @Produce json
 // @Param req body CreateTicketRequest true "info for video processing"
 // @Success 201 {object} models.VideoTicket
-// @Failure 401 {string} msg "Wrong creadentials"
-// @Failure 409 {string} msg "Provided header is not allowed"
-// @Failure 409 {string} msg "Provided media type is not allowed"
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 415 {string} msg "Provided media type is not allowed"
 // @Security ApiKeyAuth
 // @Router /tickets [post].
 func (h *videoHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
-			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+			return httper.NewWrongCredentialsMsg()
 		}
 
 		var req CreateTicketRequest
@@ -107,7 +107,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 
 		target_format, err := utils.DetectVideoFormat(req.TargetFormat)
 		if err != nil {
-			return httper.NewBadRequestMsg(httper.NotAllowedMediaTypeMsg)
+			return httper.NewNotAllowedMediaMsg()
 		}
 
 		ticket := models.VideoTicket{
@@ -138,23 +138,22 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 // @Accept json
 // @Produce json
 // @Param id path string true "Video ID"
-// @Success 201 {object} models.Video
-// @Failure 401 {string} msg "Wrong creadentials"
-// @Failure 409 {string} msg "Provided header is not allowed"
-// @Failure 409 {string} msg "Provided media type is not allowed"
-// @Failure 409 {string} msg "Bad request"
+// @Success 200 {object} models.Video
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 404 {string} msg "Not found"
 // @Security ApiKeyAuth
 // @Router /videos/{id} [get].
 func (h *videoHandlers) GetVideoByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
-			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+			return httper.NewWrongCredentialsMsg()
 		}
 
 		id, err := uuid.Parse(chi.URLParamFromCtx(r.Context(), "id"))
 		if err != nil {
-			return httper.NewBadRequestMsg(httper.BadRequestMsg)
+			return httper.NewBadRequestError(err)
 		}
 
 		video, err := h.videoUC.GetVideoByID(r.Context(), userID, id)
@@ -175,23 +174,22 @@ func (h *videoHandlers) GetVideoByID() http.Handler {
 // @Accept json
 // @Produce json
 // @Param id path string true "Video ID"
-// @Success 201 {object} models.Video
-// @Failure 401 {string} msg "Wrong creadentials"
-// @Failure 409 {string} msg "Provided header is not allowed"
-// @Failure 409 {string} msg "Provided media type is not allowed"
-// @Failure 409 {string} msg "Bad request"
+// @Success 200 {object} models.Video
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 404 {string} msg "Not found"
 // @Security ApiKeyAuth
 // @Router /tickets/{id} [get].
 func (h *videoHandlers) GetTicketByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
-			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+			return httper.NewWrongCredentialsMsg()
 		}
 
 		id, err := uuid.Parse(chi.URLParamFromCtx(r.Context(), "id"))
 		if err != nil {
-			return httper.NewBadRequestMsg(httper.BadRequestMsg)
+			return httper.NewBadRequestError(err)
 		}
 
 		ticket, err := h.videoUC.GetTicketByID(r.Context(), userID, id)
@@ -211,18 +209,17 @@ func (h *videoHandlers) GetTicketByID() http.Handler {
 // @Tags Video
 // @Accept json
 // @Produce json
-// @Success 201 {object} []models.Video
-// @Failure 401 {string} msg "Wrong creadentials"
-// @Failure 409 {string} msg "Provided header is not allowed"
-// @Failure 409 {string} msg "Provided media type is not allowed"
-// @Failure 409 {string} msg "Bad request"
+// @Success 200 {object} []models.Video
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 404 {string} msg "Not found"
 // @Security ApiKeyAuth
 // @Router /videos [get].
 func (h *videoHandlers) GetVideos() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
-			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+			return httper.NewWrongCredentialsMsg()
 		}
 
 		videos, err := h.videoUC.GetVideos(r.Context(), userID)
@@ -242,18 +239,17 @@ func (h *videoHandlers) GetVideos() http.Handler {
 // @Tags Video
 // @Accept json
 // @Produce json
-// @Success 201 {object} []models.VideoTicket
+// @Success 200 {object} []models.VideoTicket
+// @Failure 400 {string} msg "Bad request msg"
 // @Failure 401 {string} msg "Wrong creadentials"
-// @Failure 409 {string} msg "Provided header is not allowed"
-// @Failure 409 {string} msg "Provided media type is not allowed"
-// @Failure 409 {string} msg "Bad request"
+// @Failure 404 {string} msg "Not found"
 // @Security ApiKeyAuth
 // @Router /tickets [get].
 func (h *videoHandlers) GetTickets() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
-			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+			return httper.NewWrongCredentialsMsg()
 		}
 
 		tickets, err := h.videoUC.GetTickets(r.Context(), userID)

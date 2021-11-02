@@ -59,6 +59,12 @@ var doc = `{
                         }
                     },
                     "400": {
+                        "description": "Bad request msg",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "401": {
                         "description": "Wrong credentials",
                         "schema": {
                             "type": "string"
@@ -105,13 +111,7 @@ var doc = `{
                         }
                     },
                     "400": {
-                        "description": "Provided credentials don't match requirements",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "409": {
-                        "description": "User with such username already exists",
+                        "description": "Bad request msg",
                         "schema": {
                             "type": "string"
                         }

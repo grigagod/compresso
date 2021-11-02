@@ -4,6 +4,6 @@ package auth
 import "context"
 
 type Repository interface {
-	Create(ctx context.Context, user *User) (*User, error)
-	FindByName(ctx context.Context, username string) (*User, error)
+	InsertUser(ctx context.Context, user *User) (*User, error)
+	GetUserByName(ctx context.Context, username string) (*User, error)
 }

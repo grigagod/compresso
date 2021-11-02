@@ -45,6 +45,18 @@ func NewUnauthorizedMsg(msg ErrMessage) StatusError {
 	return NewStatusMsg(http.StatusUnauthorized, msg)
 }
 
+func NewWrongCredentialsMsg() StatusError {
+	return NewUnauthorizedMsg(WrongCredentialsMsg)
+}
+
+func NewNotFoundMsg() StatusError {
+	return NewStatusMsg(http.StatusNotFound, NotFoundMsg)
+}
+
+func NewNotAllowedMediaMsg() StatusError {
+	return NewStatusMsg(http.StatusUnsupportedMediaType, NotAllowedMediaTypeMsg)
+}
+
 func (st StatusError) Error() string {
 	return st.Err.Error()
 }

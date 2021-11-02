@@ -46,13 +46,19 @@ var doc = `{
                 ],
                 "summary": "Get tickets",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/models.VideoTicket"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request msg",
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     "401": {
@@ -61,8 +67,8 @@ var doc = `{
                             "type": "string"
                         }
                     },
-                    "409": {
-                        "description": "Bad request",
+                    "404": {
+                        "description": "Not found",
                         "schema": {
                             "type": "string"
                         }
@@ -104,13 +110,19 @@ var doc = `{
                             "$ref": "#/definitions/models.VideoTicket"
                         }
                     },
-                    "401": {
-                        "description": "Wrong creadentials",
+                    "400": {
+                        "description": "Bad request msg",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "409": {
+                    "401": {
+                        "description": "Wrong credentials",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "415": {
                         "description": "Provided media type is not allowed",
                         "schema": {
                             "type": "string"
@@ -147,20 +159,26 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Video"
                         }
                     },
-                    "401": {
-                        "description": "Wrong creadentials",
+                    "400": {
+                        "description": "Bad request msg",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "409": {
-                        "description": "Bad request",
+                    "401": {
+                        "description": "Wrong credentials",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
                         "schema": {
                             "type": "string"
                         }
@@ -187,8 +205,8 @@ var doc = `{
                 ],
                 "summary": "Get videos",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
@@ -196,14 +214,20 @@ var doc = `{
                             }
                         }
                     },
-                    "401": {
-                        "description": "Wrong creadentials",
+                    "400": {
+                        "description": "Bad request msg",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "409": {
-                        "description": "Bad request",
+                    "401": {
+                        "description": "Wrong credentials",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
                         "schema": {
                             "type": "string"
                         }
@@ -234,13 +258,19 @@ var doc = `{
                             "$ref": "#/definitions/models.Video"
                         }
                     },
-                    "401": {
-                        "description": "Wrong creadentials",
+                    "400": {
+                        "description": "Bad request msg",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "409": {
+                    "401": {
+                        "description": "Wrong credentials",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "415": {
                         "description": "Provided media type is not allowed",
                         "schema": {
                             "type": "string"
@@ -277,20 +307,26 @@ var doc = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Video"
                         }
                     },
-                    "401": {
-                        "description": "Wrong creadentials",
+                    "400": {
+                        "description": "Bad request msg",
                         "schema": {
                             "type": "string"
                         }
                     },
-                    "409": {
-                        "description": "Bad request",
+                    "401": {
+                        "description": "Wrong credentials",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
                         "schema": {
                             "type": "string"
                         }
@@ -372,7 +408,7 @@ var doc = `{
     "securityDefinitions": {
         "ApiKeyAuth": {
             "type": "apiKey",
-            "name": "Authorization",
+            "name": "Authorization.",
             "in": "header"
         }
     }
