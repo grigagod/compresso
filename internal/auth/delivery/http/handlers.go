@@ -30,9 +30,8 @@ func NewAuthHandlers(cfg *config.Auth, authUC auth.UseCase) auth.Handlers {
 // @Accept json
 // @Produce json
 // @Param user body AuthRequest true "user credentials"
-// @Success 201 {object} models.UserWithToken
-// @Failure 400 {string} string "Provided credentials don't match requirements"
-// @Failure 409 {string} string "User with such username already exists"
+// @Success 201 {object} auth.UserWithToken
+// @Failure 400 {string} string "Bad request msg"
 // @Router /register [post].
 func (h *authHandlers) Register() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
@@ -70,9 +69,10 @@ func (h *authHandlers) Register() http.Handler {
 // @Accept json
 // @Produce json
 // @Param creds body AuthRequest true "user credentials"
-// @Success 200 {object} models.UserWithToken
-// @Failure 400 {string} string "User with such username is not found"
-// @Failure 400 {string} string "Provided password is wrong"
+// @Success 200 {object} auth.UserWithToken
+// @Failure 400 {string} string "Bad request msg"
+// @Failure 401 {string} string "Wrong credentials"
+// @Failure 404 {string} string "User with such username is not found"
 // @Router /login [post].
 func (h *authHandlers) Login() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {

@@ -10,8 +10,19 @@ import (
 	"github.com/grigagod/compresso/pkg/db/postgres"
 	"github.com/grigagod/compresso/pkg/logger"
 	"github.com/grigagod/compresso/pkg/rmq"
+
+	_ "github.com/grigagod/compresso/docs/videoapi" // load API Docs files (Swagger)
 )
 
+// @title Video service
+// @version 1.0
+// @description This is an auto-generated API Docs.
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.email podkidysh2002@gmail.com.
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization.
 func main() {
 	logger, err := logger.NewWrappedLogger(logger.GetLoggerConfig())
 	if err != nil {

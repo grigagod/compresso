@@ -5,7 +5,7 @@ type ErrMessage string
 const (
 	BadRequestMsg          ErrMessage = "Bad request"
 	UserExistsMsg          ErrMessage = "User with such username already exists"
-	UserNotFoundMsg        ErrMessage = "User with such username is not found"
+	NotFoundMsg            ErrMessage = "Not found"
 	NotAllowedHeaderMsg    ErrMessage = "Provoded header is not allowed"
 	NotAllowedMediaTypeMsg ErrMessage = "Provided media type is not allowed"
 	NotAllowedFileSizeMsg  ErrMessage = "Provided file size is not allowed"

@@ -1,15 +1,5 @@
 definitions:
-  http.AuthRequest:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
-  models.UserWithToken:
+  auth.UserWithToken:
     properties:
       created_at:
         type: string
@@ -22,9 +12,19 @@ definitions:
       username:
         type: string
     type: object
+  http.AuthRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
 info:
   contact:
-    email: podkidysh2002@gmail.com
+    email: podkidysh2002@gmail.com.
     name: API Support
   description: This is an auto-generated API Docs.
   termsOfService: http://swagger.io/terms/
@@ -49,9 +49,17 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.UserWithToken'
+            $ref: '#/definitions/auth.UserWithToken'
         "400":
-          description: Provided password is wrong
+          description: Bad request msg
+          schema:
+            type: string
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "404":
+          description: User with such username is not found
           schema:
             type: string
       summary: Login new user
@@ -75,13 +83,9 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.UserWithToken'
+            $ref: '#/definitions/auth.UserWithToken'
         "400":
-          description: Provided password doesn't match requirements
-          schema:
-            type: string
-        "409":
-          description: User with such username already exists
+          description: Bad request msg
           schema:
             type: string
       summary: Register new user

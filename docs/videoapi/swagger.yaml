@@ -1,0 +1,256 @@
+definitions:
+  http.CreateTicketRequest:
+    properties:
+      crf:
+        type: integer
+      target_format:
+        type: string
+      video_id:
+        type: string
+    required:
+    - crf
+    - target_format
+    - video_id
+    type: object
+  models.Video:
+    properties:
+      author_id:
+        type: string
+      created_at:
+        type: string
+      format:
+        type: string
+      url:
+        type: string
+      video_id:
+        type: string
+    type: object
+  models.VideoTicket:
+    properties:
+      author_id:
+        type: string
+      created_at:
+        type: string
+      crf:
+        type: integer
+      state:
+        type: string
+      target_format:
+        type: string
+      ticket_id:
+        type: string
+      url:
+        type: string
+      video_id:
+        type: string
+    type: object
+info:
+  contact:
+    email: podkidysh2002@gmail.com.
+    name: API Support
+  description: This is an auto-generated API Docs.
+  termsOfService: http://swagger.io/terms/
+  title: Video service
+  version: "1.0"
+paths:
+  /tickets:
+    get:
+      consumes:
+      - application/json
+      description: Authorized users can get all video tickets.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.VideoTicket'
+            type: array
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
+        "401":
+          description: Wrong creadentials
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get tickets
+      tags:
+      - Video
+    post:
+      consumes:
+      - application/json
+      description: Authorized users can create tickets for processing uploaded videos
+      parameters:
+      - description: info for video processing
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/http.CreateTicketRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.VideoTicket'
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "415":
+          description: Provided media type is not allowed
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create new video ticket
+      tags:
+      - Video
+  /tickets/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Authorized users can get uploaded videos by ID.
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get video by ID
+      tags:
+      - Video
+  /videos:
+    get:
+      consumes:
+      - application/json
+      description: Authorized users can get all uploaded videos.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Video'
+            type: array
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get videos
+      tags:
+      - Video
+    post:
+      consumes:
+      - video/webm
+      description: Authorized users can upload their videos
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "415":
+          description: Provided media type is not allowed
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Create new video
+      tags:
+      - Video
+  /videos/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Authorized users can get uploaded videos by ID.
+      parameters:
+      - description: Video ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Video'
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "404":
+          description: Not found
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Get video by ID
+      tags:
+      - Video
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization.
+    type: apiKey
+swagger: "2.0"

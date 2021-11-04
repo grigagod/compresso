@@ -35,32 +35,32 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
-// Create mocks base method.
-func (m *MockRepository) Create(ctx context.Context, user *auth.User) (*auth.User, error) {
+// GetUserByName mocks base method.
+func (m *MockRepository) GetUserByName(ctx context.Context, username string) (*auth.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", ctx, user)
+	ret := m.ctrl.Call(m, "GetUserByName", ctx, username)
 	ret0, _ := ret[0].(*auth.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Create indicates an expected call of Create.
-func (mr *MockRepositoryMockRecorder) Create(ctx, user interface{}) *gomock.Call {
+// GetUserByName indicates an expected call of GetUserByName.
+func (mr *MockRepositoryMockRecorder) GetUserByName(ctx, username interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockRepository)(nil).Create), ctx, user)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByName", reflect.TypeOf((*MockRepository)(nil).GetUserByName), ctx, username)
 }
 
-// FindByName mocks base method.
-func (m *MockRepository) FindByName(ctx context.Context, username string) (*auth.User, error) {
+// InsertUser mocks base method.
+func (m *MockRepository) InsertUser(ctx context.Context, user *auth.User) (*auth.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByName", ctx, username)
+	ret := m.ctrl.Call(m, "InsertUser", ctx, user)
 	ret0, _ := ret[0].(*auth.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// FindByName indicates an expected call of FindByName.
-func (mr *MockRepositoryMockRecorder) FindByName(ctx, username interface{}) *gomock.Call {
+// InsertUser indicates an expected call of InsertUser.
+func (mr *MockRepositoryMockRecorder) InsertUser(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByName", reflect.TypeOf((*MockRepository)(nil).FindByName), ctx, username)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUser", reflect.TypeOf((*MockRepository)(nil).InsertUser), ctx, user)
 }

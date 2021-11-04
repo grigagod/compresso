@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/middleware"
@@ -22,21 +23,33 @@ func NewVideoHandlers(videoUC video.UseCase) video.Handlers {
 	}
 }
 
-func (h *videoHandlers) UploadVideo() http.Handler {
+// Register godoc
+// @Summary Create new video
+// @Description Authorized users can upload their videos
+// @Tags Video
+// @Accept video/webm
+// @Produce json
+// @Success 201 {object} models.Video
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 415 {string} msg "Provided media type is not allowed"
+// @Security ApiKeyAuth
+// @Router /videos [post].
+func (h *videoHandlers) CreateVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
-			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+			return httper.NewWrongCredentialsMsg()
 		}
 
 		contentType, ok := r.Context().Value(middleware.ContentTypeCtxKey{}).(string)
 		if !ok {
-			return httper.NewBadRequestMsg(httper.NotAllowedHeaderMsg)
+			return httper.NewNotAllowedMediaMsg()
 		}
 
 		format, err := utils.DetectVideoFormatFromHeader(contentType)
 		if err != nil {
-			return httper.NewBadRequestMsg(httper.NotAllowedMediaTypeMsg)
+			return httper.NewNotAllowedMediaMsg()
 		}
 
 		video := models.Video{
@@ -45,7 +58,7 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 			Format:   format,
 		}
 
-		v, err := h.videoUC.UploadVideo(r.Context(), &video, r.Body)
+		v, err := h.videoUC.CreateVideo(r.Context(), &video, r.Body)
 		if err != nil {
 			return err
 		}
@@ -56,11 +69,24 @@ func (h *videoHandlers) UploadVideo() http.Handler {
 	return httper.HandlerWithError(fn)
 }
 
+// Register godoc
+// @Summary Create new video ticket
+// @Description Authorized users can create tickets for processing uploaded videos
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Param req body CreateTicketRequest true "info for video processing"
+// @Success 201 {object} models.VideoTicket
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 415 {string} msg "Provided media type is not allowed"
+// @Security ApiKeyAuth
+// @Router /tickets [post].
 func (h *videoHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
-			return httper.NewStatusMsg(http.StatusUnauthorized, httper.WrongCredentialsMsg)
+			return httper.NewWrongCredentialsMsg()
 		}
 
 		var req CreateTicketRequest
@@ -81,7 +107,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 
 		target_format, err := utils.DetectVideoFormat(req.TargetFormat)
 		if err != nil {
-			return httper.NewBadRequestMsg(httper.NotAllowedMediaTypeMsg)
+			return httper.NewNotAllowedMediaMsg()
 		}
 
 		ticket := models.VideoTicket{
@@ -100,6 +126,138 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 		}
 
 		return utils.RespondWithJSON(w, http.StatusCreated, t)
+	}
+
+	return httper.HandlerWithError(fn)
+}
+
+// Register godoc
+// @Summary Get video by ID
+// @Description Authorized users can get uploaded videos by ID.
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Param id path string true "Video ID"
+// @Success 200 {object} models.Video
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 404 {string} msg "Not found"
+// @Security ApiKeyAuth
+// @Router /videos/{id} [get].
+func (h *videoHandlers) GetVideoByID() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewWrongCredentialsMsg()
+		}
+
+		id, err := uuid.Parse(chi.URLParamFromCtx(r.Context(), "id"))
+		if err != nil {
+			return httper.NewBadRequestError(err)
+		}
+
+		video, err := h.videoUC.GetVideoByID(r.Context(), userID, id)
+		if err != nil {
+			return err
+		}
+
+		return utils.RespondWithJSON(w, http.StatusOK, video)
+	}
+
+	return httper.HandlerWithError(fn)
+}
+
+// Register godoc
+// @Summary Get video by ID
+// @Description Authorized users can get uploaded videos by ID.
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Param id path string true "Video ID"
+// @Success 200 {object} models.Video
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 404 {string} msg "Not found"
+// @Security ApiKeyAuth
+// @Router /tickets/{id} [get].
+func (h *videoHandlers) GetTicketByID() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewWrongCredentialsMsg()
+		}
+
+		id, err := uuid.Parse(chi.URLParamFromCtx(r.Context(), "id"))
+		if err != nil {
+			return httper.NewBadRequestError(err)
+		}
+
+		ticket, err := h.videoUC.GetTicketByID(r.Context(), userID, id)
+		if err != nil {
+			return err
+		}
+
+		return utils.RespondWithJSON(w, http.StatusOK, ticket)
+	}
+
+	return httper.HandlerWithError(fn)
+}
+
+// Register godoc
+// @Summary Get videos
+// @Description Authorized users can get all uploaded videos.
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Success 200 {object} []models.Video
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong credentials"
+// @Failure 404 {string} msg "Not found"
+// @Security ApiKeyAuth
+// @Router /videos [get].
+func (h *videoHandlers) GetVideos() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewWrongCredentialsMsg()
+		}
+
+		videos, err := h.videoUC.GetVideos(r.Context(), userID)
+		if err != nil {
+			return err
+		}
+
+		return utils.RespondWithJSON(w, http.StatusOK, videos)
+	}
+
+	return httper.HandlerWithError(fn)
+}
+
+// Register godoc
+// @Summary Get tickets
+// @Description Authorized users can get all video tickets.
+// @Tags Video
+// @Accept json
+// @Produce json
+// @Success 200 {object} []models.VideoTicket
+// @Failure 400 {string} msg "Bad request msg"
+// @Failure 401 {string} msg "Wrong creadentials"
+// @Failure 404 {string} msg "Not found"
+// @Security ApiKeyAuth
+// @Router /tickets [get].
+func (h *videoHandlers) GetTickets() http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) error {
+		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
+		if err != nil {
+			return httper.NewWrongCredentialsMsg()
+		}
+
+		tickets, err := h.videoUC.GetTickets(r.Context(), userID)
+		if err != nil {
+			return err
+		}
+
+		return utils.RespondWithJSON(w, http.StatusOK, tickets)
 	}
 
 	return httper.HandlerWithError(fn)
