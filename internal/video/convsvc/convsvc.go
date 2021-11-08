@@ -61,16 +61,15 @@ LOOP:
 				ctx, cancel := context.WithTimeout(ctx, time.Minute)
 				defer cancel()
 				err := s.handleMsg(ctx, msg.Body)
-				if err != nil {
-					if errors.Is(err, context.Canceled) {
-						// requeue msg when err occured because of program termination
-						err := msg.Nack(false, true)
-						if err != nil {
-							s.logger.Errorw("Errorw nack message", "err", err, "msg", msg.Body)
-						}
-						return
+				if errors.Is(err, context.Canceled) {
+					// requeue msg when err occurred because of program termination
+					err := msg.Nack(false, true)
+					if err != nil {
+						s.logger.Errorw("Errorw nack message", "err", err, "msg", msg.Body)
 					}
-
+					return
+				}
+				if err != nil {
 					s.logger.Errorw("Error occurred while processing msg", "error", err.Error(), "msg", msg.Body)
 					err := msg.Nack(false, false)
 					if err != nil {
