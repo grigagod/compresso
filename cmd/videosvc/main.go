@@ -71,7 +71,7 @@ func main() {
 		signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 		<-done
-		logger.Infof("Shutting down gracefully")
+		logger.Infof("Received cancel signal, start shutdown")
 
 		cancel()
 	}(cancel)

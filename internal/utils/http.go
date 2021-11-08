@@ -4,14 +4,15 @@ package utils
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 
 	"github.com/grigagod/compresso/pkg/converter"
 )
 
-// StructScan decodes(as json) request body into model.
-func StructScan(r *http.Request, model interface{}) error {
-	decoder := json.NewDecoder(r.Body)
+// StructScan decodes(as json) into model.
+func StructScan(r io.Reader, model interface{}) error {
+	decoder := json.NewDecoder(r)
 	if err := decoder.Decode(model); err != nil {
 		return err
 	}

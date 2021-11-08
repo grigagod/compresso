@@ -37,7 +37,7 @@ func (h *authHandlers) Register() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		var req AuthRequest
 
-		if err := utils.StructScan(r, &req); err != nil {
+		if err := utils.StructScan(r.Body, &req); err != nil {
 			return httper.NewBadRequestError(err)
 		}
 
@@ -78,7 +78,7 @@ func (h *authHandlers) Login() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		var req AuthRequest
 
-		if err := utils.StructScan(r, &req); err != nil {
+		if err := utils.StructScan(r.Body, &req); err != nil {
 			return httper.NewBadRequestError(err)
 		}
 

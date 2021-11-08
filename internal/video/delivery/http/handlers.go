@@ -91,7 +91,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 
 		var req CreateTicketRequest
 
-		if err := utils.StructScan(r, &req); err != nil {
+		if err := utils.StructScan(r.Body, &req); err != nil {
 			return httper.NewBadRequestError(err)
 		}
 
