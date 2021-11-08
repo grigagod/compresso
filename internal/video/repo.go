@@ -1,3 +1,4 @@
+//go:generate mockgen -source repo.go -destination mock/repo_mock.go -package mock
 package video
 
 import (

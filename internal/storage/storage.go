@@ -11,7 +11,7 @@ import (
 )
 
 type Storage interface {
-	PutObject(ctx context.Context, file io.Reader, fileName string) error
+	PutObject(ctx context.Context, file io.Reader, fileName, fileType string) error
 	GetObject(ctx context.Context, fileName string) (io.ReadCloser, error)
 	GetDownloadURL(fileName string) (string, error)
 }
@@ -33,7 +33,7 @@ func NewAWSStorage(cfg *Config, client *s3.S3) *AWSStorage {
 }
 
 // PutObject upoad given file to the bucket.
-func (s *AWSStorage) PutObject(ctx context.Context, file io.Reader, fileName string) error {
+func (s *AWSStorage) PutObject(ctx context.Context, file io.Reader, fileName, fileType string) error {
 	_, err := s.uploader.UploadWithContext(ctx, &s3manager.UploadInput{
 		Body:   file,
 		Bucket: aws.String(s.cfg.Bucket),

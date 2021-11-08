@@ -56,6 +56,11 @@ var AllowedVideoFormats = map[string]converter.VideoFormat{
 	"webm":     converter.WebM,
 }
 
+var VideoFormatsToMIME = map[converter.VideoFormat]string{
+	converter.WebM: "video/webm",
+	converter.MKV:  "video/x-matroska",
+}
+
 // DetectVideoFormatFromHeader detect converter.VideoFormat from header.
 func DetectVideoFormatFromHeader(header string) (converter.VideoFormat, error) {
 	f, ok := AllowedVideoContentTypes[header]
@@ -71,6 +76,15 @@ func DetectVideoFormat(format string) (converter.VideoFormat, error) {
 	f, ok := AllowedVideoFormats[format]
 	if !ok {
 		return converter.VideoFormat(""), errors.New("this content type is not allowed")
+	}
+
+	return f, nil
+}
+
+func DetectVideoMIMEType(format converter.VideoFormat) (string, error) {
+	f, ok := VideoFormatsToMIME[format]
+	if !ok {
+		return "", errors.New("this content type is not allowed")
 	}
 
 	return f, nil
