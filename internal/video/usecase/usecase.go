@@ -3,7 +3,6 @@ package usecase
 
 import (
 	"context"
-	"encoding/json"
 	"io"
 
 	"github.com/google/uuid"
@@ -13,7 +12,6 @@ import (
 	"github.com/grigagod/compresso/internal/video"
 	"github.com/grigagod/compresso/pkg/rmq"
 	"github.com/pkg/errors"
-	"github.com/streadway/amqp"
 )
 
 // VideoUseCase implement video.UseCase interface.
@@ -21,10 +19,10 @@ type VideoUseCase struct {
 	qwCfg     *rmq.QueueWriteConfig
 	repo      video.Repository
 	storage   video.Storage
-	publisher *rmq.Publisher
+	publisher video.Publisher
 }
 
-func NewVideoUseCase(qwCfg *rmq.QueueWriteConfig, repo video.Repository, storage video.Storage, publisher *rmq.Publisher) *VideoUseCase {
+func NewVideoUseCase(qwCfg *rmq.QueueWriteConfig, repo video.Repository, storage video.Storage, publisher video.Publisher) *VideoUseCase {
 	return &VideoUseCase{
 		qwCfg:     qwCfg,
 		repo:      repo,
@@ -70,17 +68,12 @@ func (u *VideoUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTic
 		return nil, errors.Wrap(err, "VideoUseCase.CreateTicket.GenerateURL")
 	}
 
-	msg := &models.QueueVideoMsg{
+	msg := &models.ProcessVideoMsg{
 		TicketID:     ticket.ID,
 		CRF:          ticket.CRF,
 		TargetFormat: ticket.TargetFormat,
 		OriginURL:    video.URL,
 		ProcessedURL: url,
-	}
-
-	body, err := json.Marshal(msg)
-	if err != nil {
-		return nil, errors.Wrap(err, "VideoUseCase.CreateTicket.Marshal")
 	}
 
 	ticket.State = models.Queued
@@ -89,11 +82,7 @@ func (u *VideoUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTic
 		return nil, httper.ParseSqlError(errors.Wrap(err, "VideoUseCase.CreateTicket.InsertTicket"))
 	}
 
-	err = u.publisher.Send(rmq.NewMessage(amqp.Publishing{
-		Headers:     map[string]interface{}{},
-		ContentType: rmq.JSONContentType,
-		Body:        body,
-	}, u.qwCfg))
+	err = u.publisher.SendMsg(msg)
 	if err != nil {
 		ticket.State = models.Failed
 		_, err := u.repo.UpdateTicket(ctx, ticket)
