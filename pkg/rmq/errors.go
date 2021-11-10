@@ -2,7 +2,7 @@ package rmq
 
 import "errors"
 
-// Pkg defined errors
+// Pkg defined errors.
 var (
 	ErrNotFoundMethod     = errors.New("not found method")
 	ErrWithRequeue        = errors.New("error with requeue")

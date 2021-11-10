@@ -5,12 +5,12 @@ import (
 	"sync"
 )
 
-// Handler interface for handlers
+// Handler interface for handlers.
 type Handler interface {
 	Handle(ctx context.Context, body []byte) error
 }
 
-// HandlerFunc call anonymous function
+// HandlerFunc call anonymous function.
 type HandlerFunc func(ctx context.Context, body []byte) error
 
 // Handle for run function.
