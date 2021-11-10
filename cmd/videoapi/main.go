@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/grigagod/compresso/internal/storage"
+	"github.com/grigagod/compresso/internal/video/api/server"
 	"github.com/grigagod/compresso/internal/video/config"
-	"github.com/grigagod/compresso/internal/video/server"
 	"github.com/grigagod/compresso/pkg/db/aws"
 	"github.com/grigagod/compresso/pkg/db/postgres"
 	"github.com/grigagod/compresso/pkg/logger"
@@ -74,9 +74,7 @@ func main() {
 	}
 	defer ch.Close()
 
-	pub := rmq.NewPublisher(ch)
-
-	s := server.NewVideoServer(apiCfg, db, storage, pub, logger)
+	s := server.NewAPIServer(apiCfg, db, storage, ch, logger)
 	s.MapHandlers()
 	s.ListenAndServe(httpCfg)
 }

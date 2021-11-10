@@ -8,7 +8,7 @@ import (
 	"syscall"
 
 	"github.com/grigagod/compresso/internal/storage"
-	"github.com/grigagod/compresso/internal/video/convsvc"
+	"github.com/grigagod/compresso/internal/video/svc/server"
 	"github.com/grigagod/compresso/pkg/db/aws"
 	"github.com/grigagod/compresso/pkg/db/postgres"
 	"github.com/grigagod/compresso/pkg/logger"
@@ -61,7 +61,7 @@ func main() {
 	}
 	defer ch.Close()
 
-	svc := convsvc.NewService(ch, db, storage, logger)
+	svc := server.NewServer(ch, db, storage, logger)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
