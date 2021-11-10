@@ -2,23 +2,18 @@ package http
 
 import (
 	"net/http"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/auth"
-	"github.com/grigagod/compresso/internal/auth/config"
 	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/utils"
 )
 
 type authHandlers struct {
-	cfg    *config.Auth
 	authUC auth.UseCase
 }
 
-func NewAuthHandlers(cfg *config.Auth, authUC auth.UseCase) auth.Handlers {
+func NewAuthHandlers(authUC auth.UseCase) auth.Handlers {
 	return &authHandlers{
-		cfg:    cfg,
 		authUC: authUC,
 	}
 }
@@ -47,10 +42,8 @@ func (h *authHandlers) Register() http.Handler {
 		}
 
 		user, err := h.authUC.Register(r.Context(), &auth.User{
-			ID:        uuid.New(),
-			Username:  req.Username,
-			Password:  req.Password,
-			CreatedAt: time.Now(),
+			Username: req.Username,
+			Password: req.Password,
 		})
 		if err != nil {
 			return err
