@@ -20,9 +20,10 @@ func StructScan(r io.Reader, model interface{}) error {
 	return nil
 }
 
-// RespondWithError responds with plain text error and given code.
-func RespondWithError(w http.ResponseWriter, code int, msg string) error {
-	w.Header().Set("Content-type", "text/plain; charset=utf-8")
+// RespondWithText responds with plain text and given code.
+func RespondWithText(w http.ResponseWriter, code int, msg string) error {
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
 	_, err := w.Write([]byte(msg))
 
@@ -34,7 +35,7 @@ func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) error {
 	resp, err := json.Marshal(model)
 
 	if err != nil {
-		return RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return RespondWithText(w, http.StatusInternalServerError, err.Error())
 	}
 
 	w.Header().Set("Content-Type", "application/json")
