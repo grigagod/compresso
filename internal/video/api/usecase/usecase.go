@@ -8,23 +8,21 @@ import (
 	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/models"
+	"github.com/grigagod/compresso/internal/storage"
 	"github.com/grigagod/compresso/internal/utils"
 	"github.com/grigagod/compresso/internal/video"
-	"github.com/grigagod/compresso/pkg/rmq"
 	"github.com/pkg/errors"
 )
 
-// VideoUseCase implement video.UseCase interface.
-type VideoUseCase struct {
-	qwCfg     *rmq.QueueWriteConfig
+// APIUseCase implement video.UseCase interface.
+type APIUseCase struct {
 	repo      video.Repository
-	storage   video.Storage
+	storage   storage.Storage
 	publisher video.Publisher
 }
 
-func NewVideoUseCase(qwCfg *rmq.QueueWriteConfig, repo video.Repository, storage video.Storage, publisher video.Publisher) *VideoUseCase {
-	return &VideoUseCase{
-		qwCfg:     qwCfg,
+func NewAPIUseCase(repo video.Repository, storage storage.Storage, publisher video.Publisher) *APIUseCase {
+	return &APIUseCase{
 		repo:      repo,
 		storage:   storage,
 		publisher: publisher,
@@ -32,14 +30,19 @@ func NewVideoUseCase(qwCfg *rmq.QueueWriteConfig, repo video.Repository, storage
 }
 
 // CreateVideo upload video to the storage and make DB insert.
-func (u *VideoUseCase) CreateVideo(ctx context.Context, video *models.Video, file io.Reader) (*models.Video, error) {
+func (u *APIUseCase) CreateVideo(ctx context.Context, video *models.Video, file io.Reader) (*models.Video, error) {
 	url, err := utils.GenerateURL(video.AuthorID, video.ID)
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.CreateVideo.GenerateURL")
 	}
 	video.URL = url
 
-	err = u.storage.PutVideo(ctx, video, file)
+	format, err := utils.DetectVideoMIMEType(video.Format)
+	if err != nil {
+		return nil, errors.Wrap(err, "VideoUseCase.CreateVideo.DetectVideoMIMEType")
+	}
+
+	err = u.storage.PutObject(ctx, file, video.URL, format)
 	if err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.CreateVideo.PutObject")
 	}
@@ -49,7 +52,7 @@ func (u *VideoUseCase) CreateVideo(ctx context.Context, video *models.Video, fil
 		return nil, httper.ParseSqlError(errors.Wrap(err, "VideoUseCase.CreateVideo.InsertVideo"))
 	}
 
-	if err := u.storage.SignVideoURL(v); err != nil {
+	if err := u.signVideoURL(v); err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.CreateVideo.GetDownloadURL")
 	}
 
@@ -57,7 +60,7 @@ func (u *VideoUseCase) CreateVideo(ctx context.Context, video *models.Video, fil
 }
 
 // CreateTicket find video in DB, send message for processing to the broker and update DB.
-func (u *VideoUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTicket) (*models.VideoTicket, error) {
+func (u *APIUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTicket) (*models.VideoTicket, error) {
 	video, err := u.repo.SelectVideoByID(ctx, ticket.AuthorID, ticket.VideoID)
 	if err != nil {
 		return nil, httper.ParseSqlError(errors.Wrap(err, "VideoUseCase.CreateTicket.SelectVideoByID"))
@@ -94,13 +97,13 @@ func (u *VideoUseCase) CreateTicket(ctx context.Context, ticket *models.VideoTic
 }
 
 // GetVideoByID return author`s video with the given ID.
-func (u *VideoUseCase) GetVideoByID(ctx context.Context, authorID, id uuid.UUID) (*models.Video, error) {
+func (u *APIUseCase) GetVideoByID(ctx context.Context, authorID, id uuid.UUID) (*models.Video, error) {
 	video, err := u.repo.SelectVideoByID(ctx, authorID, id)
 	if err != nil {
 		return nil, httper.ParseSqlError(errors.Wrap(err, "VideoUseCase.GetVideoByID.SelectVideoByID"))
 	}
 
-	if err := u.storage.SignVideoURL(video); err != nil {
+	if err := u.signVideoURL(video); err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.GetVideoByID.GetDownloadURL")
 	}
 
@@ -108,13 +111,13 @@ func (u *VideoUseCase) GetVideoByID(ctx context.Context, authorID, id uuid.UUID)
 }
 
 // GetTicketByID return author`s video ticket with the given ID.
-func (u *VideoUseCase) GetTicketByID(ctx context.Context, authorID, id uuid.UUID) (*models.VideoTicket, error) {
+func (u *APIUseCase) GetTicketByID(ctx context.Context, authorID, id uuid.UUID) (*models.VideoTicket, error) {
 	ticket, err := u.repo.SelectTicketByID(ctx, authorID, id)
 	if err != nil {
 		return nil, httper.ParseSqlError(errors.Wrap(err, "VideoUseCase.GetTicketByID.SelectTicketByID"))
 	}
 
-	if err := u.storage.SignTicketURL(ticket); err != nil {
+	if err := u.signTicketURL(ticket); err != nil {
 		return nil, errors.Wrap(err, "VideoUseCase.GetTicketByID.GetDownloadURL")
 	}
 
@@ -122,7 +125,7 @@ func (u *VideoUseCase) GetTicketByID(ctx context.Context, authorID, id uuid.UUID
 }
 
 // GetVideos return author`s videos.
-func (u *VideoUseCase) GetVideos(ctx context.Context, authorID uuid.UUID) ([]*models.Video, error) {
+func (u *APIUseCase) GetVideos(ctx context.Context, authorID uuid.UUID) ([]*models.Video, error) {
 	videos, err := u.repo.SelectVideos(ctx, authorID)
 	if err != nil {
 		return nil, httper.ParseSqlError(errors.Wrap(err, "VideoUseCase.GetVideos.SelectVideos"))
@@ -134,7 +137,7 @@ func (u *VideoUseCase) GetVideos(ctx context.Context, authorID uuid.UUID) ([]*mo
 
 	// sign urls for videos
 	for _, v := range videos {
-		if err := u.storage.SignVideoURL(v); err != nil {
+		if err := u.signVideoURL(v); err != nil {
 			return nil, errors.Wrap(err, "VideoUseCase.GetVideos.GetDownloadURL")
 		}
 	}
@@ -143,7 +146,7 @@ func (u *VideoUseCase) GetVideos(ctx context.Context, authorID uuid.UUID) ([]*mo
 }
 
 // GetTickets return author`s tickets.
-func (u *VideoUseCase) GetTickets(ctx context.Context, authorID uuid.UUID) ([]*models.VideoTicket, error) {
+func (u *APIUseCase) GetTickets(ctx context.Context, authorID uuid.UUID) ([]*models.VideoTicket, error) {
 	tickets, err := u.repo.SelectTickets(ctx, authorID)
 	if err != nil {
 		return nil, httper.ParseSqlError(errors.Wrap(err, "VideoUseCase.GetTickets.SelectTickets"))
@@ -155,10 +158,32 @@ func (u *VideoUseCase) GetTickets(ctx context.Context, authorID uuid.UUID) ([]*m
 
 	// sign urls for processed tickets
 	for _, t := range tickets {
-		if err := u.storage.SignTicketURL(t); err != nil {
+		if err := u.signTicketURL(t); err != nil {
 			return nil, errors.Wrap(err, "VideoUseCase.GetVideos.GetDownloadURL")
 		}
 	}
 
 	return tickets, nil
+}
+
+func (u *APIUseCase) signVideoURL(video *models.Video) error {
+	url, err := u.storage.GetDownloadURL(video.URL)
+	if err != nil {
+		return err
+	}
+	video.URL = url
+
+	return nil
+}
+
+func (u *APIUseCase) signTicketURL(ticket *models.VideoTicket) error {
+	if ticket.State == models.Done {
+		url, err := u.storage.GetDownloadURL(ticket.URL)
+		if err != nil {
+			return err
+		}
+		ticket.URL = url
+	}
+
+	return nil
 }

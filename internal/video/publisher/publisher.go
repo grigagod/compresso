@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/grigagod/compresso/internal/models"
+	"github.com/grigagod/compresso/internal/video"
 	"github.com/grigagod/compresso/pkg/rmq"
 	"github.com/streadway/amqp"
 )
@@ -28,13 +29,15 @@ func (p *VideoPublisher) SendMsg(msg *models.ProcessVideoMsg) error {
 		return err
 	}
 
+	headers := make(map[string]interface{})
+	headers[rmq.HeaderTargetMethod] = video.ProcessVideoHeader
+
 	err = pub.Send(rmq.NewMessage(amqp.Publishing{
-		Headers:      map[string]interface{}{},
+		Headers:      headers,
 		ContentType:  rmq.JSONContentType,
 		Body:         body,
 		DeliveryMode: amqp.Persistent,
 	}, p.qwCfg))
 
 	return err
-
 }

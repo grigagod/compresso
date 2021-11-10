@@ -2,10 +2,10 @@ package http
 
 import (
 	"github.com/go-chi/chi/v5"
-	"github.com/grigagod/compresso/internal/video"
+	"github.com/grigagod/compresso/internal/video/api"
 )
 
-func MapVideoRoutes(router chi.Router, h video.Handlers) {
+func MapVideoRoutes(router chi.Router, h api.Handlers) {
 	router.Route("/videos", func(r chi.Router) {
 		r.Method("GET", "/", h.GetVideos())
 		r.Method("GET", "/{id}", h.GetVideoByID())

@@ -1,4 +1,4 @@
-package video
+package api
 
 import "net/http"
 
