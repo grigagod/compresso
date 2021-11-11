@@ -9,17 +9,17 @@ import (
 	"github.com/grigagod/compresso/internal/middleware"
 	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/internal/utils"
-	"github.com/grigagod/compresso/internal/video"
+	"github.com/grigagod/compresso/internal/video/api"
 	"github.com/grigagod/compresso/pkg/converter"
 )
 
-type videoHandlers struct {
-	videoUC video.UseCase
+type apiHandlers struct {
+	apiUC api.UseCase
 }
 
-func NewVideoHandlers(videoUC video.UseCase) video.Handlers {
-	return &videoHandlers{
-		videoUC: videoUC,
+func NewAPIHandlers(apiUC api.UseCase) api.Handlers {
+	return &apiHandlers{
+		apiUC: apiUC,
 	}
 }
 
@@ -35,7 +35,7 @@ func NewVideoHandlers(videoUC video.UseCase) video.Handlers {
 // @Failure 415 {string} msg "Provided media type is not allowed"
 // @Security ApiKeyAuth
 // @Router /videos [post].
-func (h *videoHandlers) CreateVideo() http.Handler {
+func (h *apiHandlers) CreateVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
@@ -58,7 +58,7 @@ func (h *videoHandlers) CreateVideo() http.Handler {
 			Format:   format,
 		}
 
-		v, err := h.videoUC.CreateVideo(r.Context(), &video, r.Body)
+		v, err := h.apiUC.CreateVideo(r.Context(), &video, r.Body)
 		if err != nil {
 			return err
 		}
@@ -82,7 +82,7 @@ func (h *videoHandlers) CreateVideo() http.Handler {
 // @Failure 415 {string} msg "Provided media type is not allowed"
 // @Security ApiKeyAuth
 // @Router /tickets [post].
-func (h *videoHandlers) CreateTicket() http.Handler {
+func (h *apiHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
@@ -91,7 +91,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 
 		var req CreateTicketRequest
 
-		if err := utils.StructScan(r, &req); err != nil {
+		if err := utils.StructScan(r.Body, &req); err != nil {
 			return httper.NewBadRequestError(err)
 		}
 
@@ -120,7 +120,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 			TargetFormat: target_format,
 		}
 
-		t, err := h.videoUC.CreateTicket(r.Context(), &ticket)
+		t, err := h.apiUC.CreateTicket(r.Context(), &ticket)
 		if err != nil {
 			return err
 		}
@@ -144,7 +144,7 @@ func (h *videoHandlers) CreateTicket() http.Handler {
 // @Failure 404 {string} msg "Not found"
 // @Security ApiKeyAuth
 // @Router /videos/{id} [get].
-func (h *videoHandlers) GetVideoByID() http.Handler {
+func (h *apiHandlers) GetVideoByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
@@ -156,7 +156,7 @@ func (h *videoHandlers) GetVideoByID() http.Handler {
 			return httper.NewBadRequestError(err)
 		}
 
-		video, err := h.videoUC.GetVideoByID(r.Context(), userID, id)
+		video, err := h.apiUC.GetVideoByID(r.Context(), userID, id)
 		if err != nil {
 			return err
 		}
@@ -180,7 +180,7 @@ func (h *videoHandlers) GetVideoByID() http.Handler {
 // @Failure 404 {string} msg "Not found"
 // @Security ApiKeyAuth
 // @Router /tickets/{id} [get].
-func (h *videoHandlers) GetTicketByID() http.Handler {
+func (h *apiHandlers) GetTicketByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
@@ -192,7 +192,7 @@ func (h *videoHandlers) GetTicketByID() http.Handler {
 			return httper.NewBadRequestError(err)
 		}
 
-		ticket, err := h.videoUC.GetTicketByID(r.Context(), userID, id)
+		ticket, err := h.apiUC.GetTicketByID(r.Context(), userID, id)
 		if err != nil {
 			return err
 		}
@@ -215,14 +215,14 @@ func (h *videoHandlers) GetTicketByID() http.Handler {
 // @Failure 404 {string} msg "Not found"
 // @Security ApiKeyAuth
 // @Router /videos [get].
-func (h *videoHandlers) GetVideos() http.Handler {
+func (h *apiHandlers) GetVideos() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
 			return httper.NewWrongCredentialsMsg()
 		}
 
-		videos, err := h.videoUC.GetVideos(r.Context(), userID)
+		videos, err := h.apiUC.GetVideos(r.Context(), userID)
 		if err != nil {
 			return err
 		}
@@ -245,14 +245,14 @@ func (h *videoHandlers) GetVideos() http.Handler {
 // @Failure 404 {string} msg "Not found"
 // @Security ApiKeyAuth
 // @Router /tickets [get].
-func (h *videoHandlers) GetTickets() http.Handler {
+func (h *apiHandlers) GetTickets() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
 		if err != nil {
 			return httper.NewWrongCredentialsMsg()
 		}
 
-		tickets, err := h.videoUC.GetTickets(r.Context(), userID)
+		tickets, err := h.apiUC.GetTickets(r.Context(), userID)
 		if err != nil {
 			return err
 		}

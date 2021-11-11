@@ -23,8 +23,8 @@ func NewVideoRepository(db *sqlx.DB) *VideoRepo {
 // InsertVideo insert video model in DB.
 func (r *VideoRepo) InsertVideo(ctx context.Context, video *models.Video) (*models.Video, error) {
 	query := `INSERT INTO
-        svc.user_videos(video_id, author_id, format, url, created_at)
-        VALUES($1, $2, $3, $4, now()) RETURNING *`
+        svc.user_videos(video_id, author_id, format, url)
+        VALUES($1, $2, $3, $4) RETURNING *`
 
 	var v models.Video
 
@@ -39,8 +39,8 @@ func (r *VideoRepo) InsertVideo(ctx context.Context, video *models.Video) (*mode
 // InsertTicket insert video ticket model in DB.
 func (r *VideoRepo) InsertTicket(ctx context.Context, ticket *models.VideoTicket) (*models.VideoTicket, error) {
 	query := `INSERT INTO
-        svc.video_tickets(ticket_id, video_id, author_id, target_format, state, crf, url, created_at)
-        VALUES($1, $2, $3, $4, $5, $6, COALESCE(NULLIF($7, ''), $7), now()) RETURNING *`
+        svc.video_tickets(ticket_id, video_id, author_id, target_format, state, crf, url)
+        VALUES($1, $2, $3, $4, $5, $6, COALESCE(NULLIF($7, ''), $7)) RETURNING *`
 
 	var t models.VideoTicket
 

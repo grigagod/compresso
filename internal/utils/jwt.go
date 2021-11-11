@@ -9,7 +9,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
-	"github.com/grigagod/compresso/internal/httper"
 )
 
 // GenerateJWTToken generates new JWT Token with claims, which includes the id and expiry time.
@@ -43,7 +42,7 @@ func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*jwt.Registere
 	// Parse the JWT string
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.RegisteredClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, httper.NewUnauthorizedMsg(httper.UnexpectedSignatureMsg)
+			return nil, errors.New("unexpected signing method")
 		}
 		return []byte(jwtSecretKey), nil
 	})
@@ -52,12 +51,12 @@ func ExtractJWTFromRequest(r *http.Request, jwtSecretKey string) (*jwt.Registere
 	}
 
 	if !token.Valid {
-		return nil, httper.NewUnauthorizedMsg(httper.InvalidTokenMsg)
+		return nil, errors.New("invalid token")
 	}
 
 	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
-		return nil, httper.NewUnauthorizedMsg(httper.InvalidTokenMsg)
+		return nil, errors.New("invalid token")
 	}
 
 	return claims, nil

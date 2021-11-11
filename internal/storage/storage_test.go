@@ -27,7 +27,7 @@ func TestAWSStorage_BasicOperations(t *testing.T) {
 	file := []byte(string("hello S3!"))
 
 	t.Run("PutObject", func(t *testing.T) {
-		err := storage.PutObject(context.Background(), bytes.NewReader(file), string("test_basic.txt"))
+		err := storage.PutObject(context.Background(), bytes.NewReader(file), string("test_basic.txt"), "text/plain")
 		assert.NoError(t, err)
 	})
 
@@ -55,7 +55,7 @@ func TestAWSStorage_BasicOperations(t *testing.T) {
 
 	t.Run("PutObjectContextTimeout", func(t *testing.T) {
 		ctx, _ := context.WithTimeout(context.Background(), time.Microsecond)
-		err := storage.PutObject(ctx, bytes.NewReader(file), string("test_basic.txt"))
+		err := storage.PutObject(ctx, bytes.NewReader(file), string("test_basic.txt"), "text/plain")
 		assert.Error(t, err)
 
 		awsErr, ok := errors.Cause(err).(awserr.Error)
