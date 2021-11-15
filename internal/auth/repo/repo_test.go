@@ -1,3 +1,5 @@
+//go:build unit
+
 package repo
 
 import (
@@ -12,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestAuthRepo_Create(t *testing.T) {
+func TestAuthRepo_InsertUser(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
@@ -24,7 +26,7 @@ func TestAuthRepo_Create(t *testing.T) {
 
 	authRepo := NewAuthRepository(sqlxDB)
 
-	t.Run("Create", func(t *testing.T) {
+	t.Run("Main case", func(t *testing.T) {
 		user := &auth.User{
 			ID:        uuid.New(),
 			Username:  "test",
@@ -48,7 +50,7 @@ func TestAuthRepo_Create(t *testing.T) {
 	})
 }
 
-func TestAuthRepo_FindByName(t *testing.T) {
+func TestAuthRepo_SelectUserByName(t *testing.T) {
 	t.Parallel()
 
 	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
@@ -60,7 +62,7 @@ func TestAuthRepo_FindByName(t *testing.T) {
 
 	authRepo := NewAuthRepository(sqlxDB)
 
-	t.Run("FindByName", func(t *testing.T) {
+	t.Run("Main Case", func(t *testing.T) {
 		user := &auth.User{
 			ID:        uuid.New(),
 			Username:  "test",
@@ -74,7 +76,7 @@ func TestAuthRepo_FindByName(t *testing.T) {
 		query := `SELECT * FROM svc.users WHERE username = $1`
 		mock.ExpectQuery(query).WithArgs(user.Username).WillReturnRows(rows)
 
-		foundUser, err := authRepo.GetUserByName(context.Background(), user.Username)
+		foundUser, err := authRepo.SelectUserByName(context.Background(), user.Username)
 
 		require.NoError(t, err)
 		require.Equal(t, foundUser, user)

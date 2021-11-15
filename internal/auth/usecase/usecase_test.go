@@ -1,3 +1,5 @@
+//go:build unit
+
 package usecase_test
 
 import (
@@ -31,7 +33,7 @@ func TestAuthUseCase_Register(t *testing.T) {
 	}
 
 	t.Run("Main case", func(t *testing.T) {
-		mockAuthRepo.EXPECT().GetUserByName(context.Background(), gomock.Eq(user.Username)).Return(nil, sql.ErrNoRows)
+		mockAuthRepo.EXPECT().SelectUserByName(context.Background(), gomock.Eq(user.Username)).Return(nil, sql.ErrNoRows)
 		mockAuthRepo.EXPECT().InsertUser(context.Background(), gomock.Eq(user)).Return(user, nil)
 
 		createdUser, err := authUC.Register(context.Background(), user)
@@ -40,8 +42,8 @@ func TestAuthUseCase_Register(t *testing.T) {
 		require.NotNil(t, createdUser)
 
 	})
-	t.Run("Already existst", func(t *testing.T) {
-		mockAuthRepo.EXPECT().GetUserByName(context.Background(), gomock.Eq(user.Username)).Return(user, nil)
+	t.Run("Already exist", func(t *testing.T) {
+		mockAuthRepo.EXPECT().SelectUserByName(context.Background(), gomock.Eq(user.Username)).Return(user, nil)
 
 		createdUser, err := authUC.Register(context.Background(), user)
 
@@ -75,7 +77,7 @@ func TestAuthUseCase_Login(t *testing.T) {
 	}
 
 	t.Run("Main case", func(t *testing.T) {
-		mockAuthRepo.EXPECT().GetUserByName(context.Background(), gomock.Eq(user.Username)).Return(mockUser, nil)
+		mockAuthRepo.EXPECT().SelectUserByName(context.Background(), gomock.Eq(user.Username)).Return(mockUser, nil)
 
 		userWithToken, err := authUC.Login(context.Background(), user)
 
@@ -83,8 +85,8 @@ func TestAuthUseCase_Login(t *testing.T) {
 		require.NotNil(t, userWithToken)
 
 	})
-	t.Run("User not exist", func(t *testing.T) {
-		mockAuthRepo.EXPECT().GetUserByName(context.Background(), gomock.Eq(user.Username)).Return(nil, sql.ErrNoRows)
+	t.Run("User not found", func(t *testing.T) {
+		mockAuthRepo.EXPECT().SelectUserByName(context.Background(), gomock.Eq(user.Username)).Return(nil, sql.ErrNoRows)
 
 		userWithToken, err := authUC.Login(context.Background(), user)
 
@@ -92,12 +94,11 @@ func TestAuthUseCase_Login(t *testing.T) {
 		require.Error(t, err)
 	})
 	t.Run("Wrong password", func(t *testing.T) {
-		mockAuthRepo.EXPECT().GetUserByName(context.Background(), gomock.Eq(user.Username)).Return(user, nil)
+		mockAuthRepo.EXPECT().SelectUserByName(context.Background(), gomock.Eq(user.Username)).Return(user, nil)
 
 		userWithToken, err := authUC.Login(context.Background(), user)
 
 		require.Nil(t, userWithToken)
 		require.Error(t, err)
-
 	})
 }
