@@ -54,8 +54,8 @@ func TestAPIUseCase_MainCases(t *testing.T) {
 		TargetFormat: converter.WebM,
 	}
 
-	format, err := utils.DetectVideoMIMEType(video.Format)
-	require.NoError(t, err)
+	format, ok := utils.DetectVideoMIMEType(video.Format)
+	require.True(t, ok)
 
 	url, err = utils.GenerateURL(ticket.AuthorID, ticket.ID)
 	require.NoError(t, err)

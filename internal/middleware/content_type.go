@@ -1,14 +1,12 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"strings"
 
 	"github.com/grigagod/compresso/internal/httper"
+	"github.com/grigagod/compresso/internal/utils"
 )
-
-type ContentTypeCtxKey struct{}
 
 func ContentType(contentTypes ...string) func(next http.Handler) http.Handler {
 	allowedContentTypes := make(map[string]struct{}, len(contentTypes))
@@ -30,11 +28,11 @@ func ContentType(contentTypes ...string) func(next http.Handler) http.Handler {
 			}
 
 			if _, ok := allowedContentTypes[s]; ok {
-				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), ContentTypeCtxKey{}, s)))
+				next.ServeHTTP(w, r.WithContext(utils.ContextWithContentType(r.Context(), s)))
 				return nil
 			}
 
-			return httper.NewNotAllowedMediaMsg()
+			return httper.NewNotAllowedContentType()
 		}
 		return httper.HandlerWithError(fn)
 	}

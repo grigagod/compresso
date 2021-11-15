@@ -37,8 +37,8 @@ func (u *APIUseCase) CreateVideo(ctx context.Context, video *models.Video, file 
 	}
 	video.URL = url
 
-	format, err := utils.DetectVideoMIMEType(video.Format)
-	if err != nil {
+	format, ok := utils.DetectVideoMIMEType(video.Format)
+	if !ok {
 		return nil, errors.Wrap(err, "VideoUseCase.CreateVideo.DetectVideoMIMEType")
 	}
 

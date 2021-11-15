@@ -3,11 +3,8 @@ package utils
 
 import (
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
-
-	"github.com/grigagod/compresso/pkg/converter"
 )
 
 // StructScan decodes(as json) into model.
@@ -43,50 +40,4 @@ func RespondWithJSON(w http.ResponseWriter, code int, model interface{}) error {
 	_, err = w.Write(resp)
 
 	return err
-}
-
-var AllowedVideoContentTypes = map[string]converter.VideoFormat{
-	"video/x-matroska": converter.MKV,
-	"video/webm":       converter.WebM,
-}
-
-var AllowedContentTypes = []string{"video/x-matroska", "video/webm", "application/json"}
-
-var AllowedVideoFormats = map[string]converter.VideoFormat{
-	"matroska": converter.MKV,
-	"webm":     converter.WebM,
-}
-
-var VideoFormatsToMIME = map[converter.VideoFormat]string{
-	converter.WebM: "video/webm",
-	converter.MKV:  "video/x-matroska",
-}
-
-// DetectVideoFormatFromHeader detect converter.VideoFormat from header.
-func DetectVideoFormatFromHeader(header string) (converter.VideoFormat, error) {
-	f, ok := AllowedVideoContentTypes[header]
-	if !ok {
-		return converter.VideoFormat(""), errors.New("this content type is not allowed")
-	}
-
-	return f, nil
-}
-
-// DetectVideoFormat detect converter.VideoFormat from string.
-func DetectVideoFormat(format string) (converter.VideoFormat, error) {
-	f, ok := AllowedVideoFormats[format]
-	if !ok {
-		return converter.VideoFormat(""), errors.New("this content type is not allowed")
-	}
-
-	return f, nil
-}
-
-func DetectVideoMIMEType(format converter.VideoFormat) (string, error) {
-	f, ok := VideoFormatsToMIME[format]
-	if !ok {
-		return "", errors.New("this content type is not allowed")
-	}
-
-	return f, nil
 }

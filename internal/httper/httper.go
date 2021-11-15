@@ -53,8 +53,8 @@ func NewNotFoundMsg() StatusError {
 	return NewStatusMsg(http.StatusNotFound, NotFoundMsg)
 }
 
-func NewNotAllowedMediaMsg() StatusError {
-	return NewStatusMsg(http.StatusUnsupportedMediaType, NotAllowedMediaTypeMsg)
+func NewNotAllowedContentType() StatusError {
+	return NewBadRequestMsg(NotAllowedContentType)
 }
 
 func (st StatusError) Error() string {

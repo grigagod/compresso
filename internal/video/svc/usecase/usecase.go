@@ -39,15 +39,13 @@ func (u *SVCUseCase) ProcessVideo(ctx context.Context, msg *models.ProcessVideoM
 	}
 
 	// determine MIME type for the target video
-	format, err := utils.DetectVideoMIMEType(ticket.TargetFormat)
-	if err != nil {
-		upderr := u.updateTicketState(ctx, ticket, models.Failed)
-		return errors.Wrap(upderr, err.Error())
+	format, ok := utils.DetectVideoMIMEType(ticket.TargetFormat)
+	if !ok {
+		return u.updateTicketState(ctx, ticket, models.Failed)
 	}
 
 	// update ticket status in DB
-	err = u.updateTicketState(ctx, ticket, models.Processing)
-	if err != nil {
+	if err := u.updateTicketState(ctx, ticket, models.Processing); err != nil {
 		return err
 	}
 
