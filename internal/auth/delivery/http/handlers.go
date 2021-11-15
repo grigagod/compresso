@@ -75,6 +75,11 @@ func (h *AuthHandlers) Login() http.Handler {
 			return httper.NewBadRequestError(err)
 		}
 
+		err := utils.ValidateStruct(&req)
+		if err != nil {
+			return httper.ParseValidatorError(err)
+		}
+
 		user, err := h.authUC.Login(r.Context(), &auth.User{
 			Username: req.Username,
 			Password: req.Password,
