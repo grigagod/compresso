@@ -155,7 +155,7 @@ func TestAPIHandlers(t *testing.T) {
 			basePath: "/videos/",
 			cases: []testCase{
 				{
-					name:      "ID main case",
+					name:      "main case",
 					reqPath:   video.ID.String(),
 					reqUserID: video.AuthorID,
 					mockExpect: func(uc *mock.MockUseCase) {
@@ -189,7 +189,7 @@ func TestAPIHandlers(t *testing.T) {
 					requirements:        func(t *testing.T, rec *httptest.ResponseRecorder) {},
 				},
 				{
-					name:      "ID not found",
+					name:      "not found",
 					reqPath:   video.ID.String(),
 					reqUserID: video.AuthorID,
 					mockExpect: func(uc *mock.MockUseCase) {
@@ -209,7 +209,7 @@ func TestAPIHandlers(t *testing.T) {
 			basePath: "/tickets/",
 			cases: []testCase{
 				{
-					name:      "ID main case",
+					name:      "main case",
 					reqPath:   ticket.ID.String(),
 					reqUserID: ticket.AuthorID,
 					mockExpect: func(uc *mock.MockUseCase) {
@@ -223,7 +223,7 @@ func TestAPIHandlers(t *testing.T) {
 					},
 				},
 				{
-					name:                "ID no user ID in context",
+					name:                "no user ID in context",
 					reqPath:             ticket.ID.String(),
 					reqUserID:           uuid.UUID{},
 					mockExpect:          func(uc *mock.MockUseCase) {},
