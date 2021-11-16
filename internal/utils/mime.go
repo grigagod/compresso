@@ -4,6 +4,11 @@ import (
 	"github.com/grigagod/compresso/pkg/converter"
 )
 
+const (
+	JSONContentType = "application/json"
+	TextContentType = "text/plain; charset=utf-8"
+)
+
 var AllowedVideoContentTypes = map[string]converter.VideoFormat{
 	"video/x-matroska": converter.MKV,
 	"video/webm":       converter.WebM,
