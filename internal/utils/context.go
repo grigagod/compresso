@@ -26,8 +26,8 @@ func UserIDFromContext(ctx context.Context) (uuid.UUID, bool) {
 	userID, err := uuid.Parse(token)
 	if err != nil {
 		return uuid.UUID{}, false
-
 	}
+
 	return userID, true
 }
 
