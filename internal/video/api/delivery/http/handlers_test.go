@@ -155,7 +155,7 @@ func TestAPIHandlers(t *testing.T) {
 			basePath: "/videos/",
 			cases: []testCase{
 				{
-					name:      "Get video by ID main case",
+					name:      "ID main case",
 					reqPath:   video.ID.String(),
 					reqUserID: video.AuthorID,
 					mockExpect: func(uc *mock.MockUseCase) {
@@ -169,7 +169,7 @@ func TestAPIHandlers(t *testing.T) {
 					},
 				},
 				{
-					name:                "Get video by ID no user ID in context",
+					name:                "no user ID in context",
 					reqPath:             video.ID.String(),
 					reqUserID:           uuid.UUID{},
 					mockExpect:          func(uc *mock.MockUseCase) {},
@@ -180,7 +180,7 @@ func TestAPIHandlers(t *testing.T) {
 					},
 				},
 				{
-					name:                "Get video by ID bad ID ",
+					name:                "bad ID ",
 					reqPath:             "video_id",
 					reqUserID:           video.AuthorID,
 					mockExpect:          func(uc *mock.MockUseCase) {},
@@ -189,7 +189,7 @@ func TestAPIHandlers(t *testing.T) {
 					requirements:        func(t *testing.T, rec *httptest.ResponseRecorder) {},
 				},
 				{
-					name:      "Get video by ID not found",
+					name:      "ID not found",
 					reqPath:   video.ID.String(),
 					reqUserID: video.AuthorID,
 					mockExpect: func(uc *mock.MockUseCase) {
@@ -209,7 +209,7 @@ func TestAPIHandlers(t *testing.T) {
 			basePath: "/tickets/",
 			cases: []testCase{
 				{
-					name:      "Get ticket by ID main case",
+					name:      "ID main case",
 					reqPath:   ticket.ID.String(),
 					reqUserID: ticket.AuthorID,
 					mockExpect: func(uc *mock.MockUseCase) {
@@ -223,7 +223,7 @@ func TestAPIHandlers(t *testing.T) {
 					},
 				},
 				{
-					name:                "Get ticket by ID no user ID in context",
+					name:                "ID no user ID in context",
 					reqPath:             ticket.ID.String(),
 					reqUserID:           uuid.UUID{},
 					mockExpect:          func(uc *mock.MockUseCase) {},
@@ -234,7 +234,7 @@ func TestAPIHandlers(t *testing.T) {
 					},
 				},
 				{
-					name:                "Get ticket by ID bad ID",
+					name:                "bad ID",
 					reqPath:             "ticket_id",
 					reqUserID:           ticket.AuthorID,
 					mockExpect:          func(uc *mock.MockUseCase) {},
@@ -243,7 +243,7 @@ func TestAPIHandlers(t *testing.T) {
 					requirements:        func(t *testing.T, rec *httptest.ResponseRecorder) {},
 				},
 				{
-					name:      "Get ticket by ID not found",
+					name:      "not found",
 					reqPath:   ticket.ID.String(),
 					reqUserID: ticket.AuthorID,
 					mockExpect: func(uc *mock.MockUseCase) {
