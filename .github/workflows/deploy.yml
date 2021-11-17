@@ -36,7 +36,7 @@ jobs:
           push: true
           file: docker/videoapi/Dockerfile
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/videosvc:latest
+            ${{ secrets.DOCKER_USERNAME }}/videoapi:latest
       -
         name: Build and push video svc
         uses: docker/build-push-action@v2
