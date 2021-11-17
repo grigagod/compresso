@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  postgresql:
+    image: postgres:12-alpine
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - ${HOME}/pgdata/:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=121073
+      - POSTGRES_DB=compresso
+    networks:
+      - local_svc
+
+  rabbitmq3:
+    image: rabbitmq:3-management
+    ports:
+      # AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+    networks:
+      - local_svc
+
+networks:
+  local_svc:
+    driver: bridge

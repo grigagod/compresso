@@ -1,0 +1,94 @@
+definitions:
+  auth.UserWithToken:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      password:
+        type: string
+      token:
+        type: string
+      username:
+        type: string
+    type: object
+  http.AuthRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+info:
+  contact:
+    email: podkidysh2002@gmail.com.
+    name: API Support
+  description: This is an auto-generated API Docs.
+  termsOfService: http://swagger.io/terms/
+  title: Auth service
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: login user, returns user and token
+      parameters:
+      - description: user credentials
+        in: body
+        name: creds
+        required: true
+        schema:
+          $ref: '#/definitions/http.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.UserWithToken'
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
+        "401":
+          description: Wrong credentials
+          schema:
+            type: string
+        "404":
+          description: User with such username is not found
+          schema:
+            type: string
+      summary: Login new user
+      tags:
+      - Auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: register new user, returns user and token
+      parameters:
+      - description: user credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/http.AuthRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/auth.UserWithToken'
+        "400":
+          description: Bad request msg
+          schema:
+            type: string
+      summary: Register new user
+      tags:
+      - Auth
+swagger: "2.0"
