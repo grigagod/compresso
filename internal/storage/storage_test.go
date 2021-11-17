@@ -23,7 +23,7 @@ func TestIntegration_AWSStorage(t *testing.T) {
 
 	cfg := &Config{
 		Bucket:          "compresso-test",
-		PresignDuration: 1 * time.Second,
+		PresignDuration: 2 * time.Second,
 	}
 	storage := NewAWSStorage(cfg, client)
 	file := []byte(string("hello S3!"))
@@ -80,7 +80,7 @@ func TestIntegration_AWSStorage(t *testing.T) {
 		url, err := storage.GetDownloadURL("test_basic.txt")
 		assert.NoError(t, err)
 
-		time.Sleep(time.Second)
+		time.Sleep(time.Second * 2)
 
 		resp, err := http.Get(url)
 		assert.NoError(t, err)
