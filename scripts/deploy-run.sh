@@ -1,4 +1,4 @@
-!bin/bash
+#!bin/bash
 
 # start watchtower
 docker run --privileged -d --name wathtower \
