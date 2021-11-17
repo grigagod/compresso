@@ -29,9 +29,10 @@ func NewAWSStorage(cfg *Config, client *s3.S3) *AWSStorage {
 // PutObject upoad given file to the bucket.
 func (s *AWSStorage) PutObject(ctx context.Context, file io.Reader, fileName, fileType string) error {
 	_, err := s.uploader.UploadWithContext(ctx, &s3manager.UploadInput{
-		Body:   file,
-		Bucket: aws.String(s.cfg.Bucket),
-		Key:    aws.String(fileName),
+		Body:        file,
+		Bucket:      aws.String(s.cfg.Bucket),
+		Key:         aws.String(fileName),
+		ContentType: aws.String(fileType),
 	})
 	if err != nil {
 		return errors.Wrap(err, "AWSStorage.PutObject")
