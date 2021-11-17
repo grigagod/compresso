@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
-	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aws/aws-sdk-go v1.41.12
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/chi/v5 v5.0.5
