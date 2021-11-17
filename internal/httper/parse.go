@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt"
+	"github.com/grigagod/compresso/pkg/converter"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgerrcode"
 )
@@ -18,6 +19,10 @@ func ParseValidatorError(err error) Error {
 
 	if strings.Contains(err.Error(), "Username") {
 		return NewBadRequestMsg(InvalidUsernameMsg)
+	}
+
+	if strings.Contains(err.Error(), "CRF") {
+		return NewBadRequestError(converter.ErrVideoCRF)
 	}
 
 	return NewBadRequestError(err)

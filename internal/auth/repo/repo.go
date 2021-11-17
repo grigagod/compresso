@@ -27,8 +27,8 @@ func (r *AuthRepo) InsertUser(ctx context.Context, user *auth.User) (*auth.User,
 	return u, nil
 }
 
-// GetUserByName find user by name in DB.
-func (r *AuthRepo) GetUserByName(ctx context.Context, username string) (*auth.User, error) {
+// SelectUserByName find user by name in DB.
+func (r *AuthRepo) SelectUserByName(ctx context.Context, username string) (*auth.User, error) {
 	query := `SELECT * FROM svc.users WHERE username = $1`
 	u := &auth.User{}
 

@@ -5,5 +5,5 @@ import "context"
 
 type Repository interface {
 	InsertUser(ctx context.Context, user *User) (*User, error)
-	GetUserByName(ctx context.Context, username string) (*User, error)
+	SelectUserByName(ctx context.Context, username string) (*User, error)
 }

@@ -1,3 +1,5 @@
+//go:build integration
+
 package storage
 
 import (
@@ -15,7 +17,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAWSStorage_BasicOperations(t *testing.T) {
+func TestIntegration_AWSStorage(t *testing.T) {
 	client, err := aws.NewClientWithEnvCredentials()
 	assert.NoError(t, err)
 

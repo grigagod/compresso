@@ -1,3 +1,5 @@
+//go:build unit
+
 package http
 
 import (
@@ -8,132 +10,209 @@ import (
 	"testing"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/mock"
 	"github.com/grigagod/compresso/internal/httper"
+	"github.com/grigagod/compresso/internal/utils"
 	"github.com/stretchr/testify/require"
 )
 
-func TestAuthHandlers_Register(t *testing.T) {
-	t.Parallel()
-
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockAuthUC := mock.NewMockUseCase(ctrl)
-
-	authHandlers := NewAuthHandlers(mockAuthUC)
-
-	t.Run("Main case", func(t *testing.T) {
-		user := &auth.User{
-			Username: "test",
-			Password: "test",
-		}
-
-		userWithToken := &auth.UserWithToken{User: &auth.User{
+// Common objects for testing.
+var (
+	user = &auth.User{
+		Username: "test",
+		Password: "test",
+	}
+	authBody      = []byte(`{"username": "test", "password": "test"}`)
+	userWithToken = &auth.UserWithToken{
+		User: &auth.User{
 			ID:        uuid.New(),
 			Username:  user.Username,
+			Password:  "",
 			CreatedAt: time.Now(),
-		}, Token: "token"}
+		},
+	}
+)
 
-		body, err := json.Marshal(user)
-		require.NoError(t, err)
-		require.NotNil(t, body)
+func TestAuthHandlers_Register(t *testing.T) {
+	testCases := []struct {
+		name                string
+		reqBody             []byte
+		mockExpect          func(uc *mock.MockUseCase)
+		expectedStatusCode  int
+		expectedContentType string
+		requirements        func(t *testing.T, rec *httptest.ResponseRecorder)
+	}{
+		{
+			name:    "Main case",
+			reqBody: authBody,
+			mockExpect: func(uc *mock.MockUseCase) {
+				uc.EXPECT().Register(gomock.Any(), gomock.Eq(user)).Return(userWithToken, nil)
+			},
+			expectedStatusCode:  http.StatusCreated,
+			expectedContentType: utils.JSONContentType,
+			requirements: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				resp := new(auth.UserWithToken)
+				require.NoError(t, json.Unmarshal(rec.Body.Bytes(), resp))
+				require.EqualValues(t, "", resp.Password)
+			},
+		},
+		{
+			name:    "User exists",
+			reqBody: authBody,
+			mockExpect: func(uc *mock.MockUseCase) {
+				uc.EXPECT().Register(gomock.Any(), gomock.Eq(user)).Return(nil, httper.NewBadRequestMsg(httper.UserExistsMsg))
+			},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedContentType: utils.TextContentType,
+			requirements: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				require.Equal(t, rec.Body.String(), string(httper.UserExistsMsg))
+			},
+		},
+		{
+			name:                "Validate password",
+			reqBody:             []byte(`{"username": "test", "password": "1"}`),
+			mockExpect:          func(uc *mock.MockUseCase) {},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedContentType: utils.TextContentType,
+			requirements: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				require.Equal(t, rec.Body.String(), string(httper.InvalidPasswordMsg))
+			},
+		},
+		{
+			name:                "Validate username",
+			reqBody:             []byte(`{"username": "t", "password": "1234"}`),
+			mockExpect:          func(uc *mock.MockUseCase) {},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedContentType: utils.TextContentType,
+			requirements: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				require.Equal(t, rec.Body.String(), string(httper.InvalidUsernameMsg))
+			},
+		},
+		{
+			name:                "Invalid request body",
+			reqBody:             []byte(""),
+			mockExpect:          func(uc *mock.MockUseCase) {},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedContentType: utils.TextContentType,
+			requirements:        func(t *testing.T, rec *httptest.ResponseRecorder) {},
+		},
+	}
 
-		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		rec := httptest.NewRecorder()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-		mockAuthUC.EXPECT().Register(req.Context(), gomock.Eq(user)).Return(userWithToken, nil)
+			mockAuthUC := mock.NewMockUseCase(ctrl)
+			tc.mockExpect(mockAuthUC)
 
-		handlerFunc := authHandlers.Register()
-		handlerFunc.ServeHTTP(rec, req)
+			authHandlers := NewAuthHandlers(mockAuthUC)
 
-		require.Equal(t, rec.Code, http.StatusCreated)
-		require.Equal(t, "application/json", rec.Header().Get("Content-Type"))
-	})
-	t.Run("Invalid password", func(t *testing.T) {
-		user := &auth.User{
-			Username: "test",
-			Password: "t",
-		}
+			req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(tc.reqBody))
+			req.Header.Set("Content-Type", utils.JSONContentType)
+			rec := httptest.NewRecorder()
 
-		body, err := json.Marshal(user)
-		require.NoError(t, err)
-		require.NotNil(t, body)
+			mux := chi.NewMux()
+			mux.Method("POST", "/register", authHandlers.Register())
+			mux.ServeHTTP(rec, req)
 
-		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		rec := httptest.NewRecorder()
-
-		handlerFunc := authHandlers.Register()
-		handlerFunc.ServeHTTP(rec, req)
-
-		require.Equal(t, rec.Code, http.StatusBadRequest)
-		require.Equal(t, "text/plain; charset=utf-8", rec.Header().Get("Content-Type"))
-		require.EqualValues(t, rec.Body.String(), string(httper.InvalidPasswordMsg))
-	})
+			require.Equal(t, tc.expectedStatusCode, rec.Code)
+			require.Equal(t, tc.expectedContentType, rec.Header().Get("Content-Type"))
+			tc.requirements(t, rec)
+		})
+	}
 }
 
 func TestAuthHandlers_Login(t *testing.T) {
-	t.Parallel()
+	testCases := []struct {
+		name                string
+		reqBody             []byte
+		mockExpect          func(uc *mock.MockUseCase)
+		expectedStatusCode  int
+		expectedContentType string
+		requirements        func(t *testing.T, rec *httptest.ResponseRecorder)
+	}{
+		{
+			name:    "Main case",
+			reqBody: authBody,
+			mockExpect: func(uc *mock.MockUseCase) {
+				uc.EXPECT().Login(gomock.Any(), gomock.Eq(user)).Return(userWithToken, nil)
+			},
+			expectedStatusCode:  http.StatusOK,
+			expectedContentType: utils.JSONContentType,
+			requirements: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				resp := new(auth.UserWithToken)
+				require.NoError(t, json.Unmarshal(rec.Body.Bytes(), resp))
+				require.EqualValues(t, "", resp.Password)
+			},
+		},
 
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+		{
+			name:    "Wrong credentials",
+			reqBody: authBody,
+			mockExpect: func(uc *mock.MockUseCase) {
+				uc.EXPECT().Login(gomock.Any(), gomock.Eq(user)).Return(nil, httper.NewWrongCredentialsMsg())
+			},
+			expectedStatusCode:  http.StatusUnauthorized,
+			expectedContentType: utils.TextContentType,
+			requirements: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				require.Equal(t, rec.Body.String(), string(httper.WrongCredentialsMsg))
+			},
+		},
+		{
+			name:                "Validate password",
+			reqBody:             []byte(`{"username": "test", "password": "1"}`),
+			mockExpect:          func(uc *mock.MockUseCase) {},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedContentType: utils.TextContentType,
+			requirements: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				require.Equal(t, rec.Body.String(), string(httper.InvalidPasswordMsg))
+			},
+		},
+		{
+			name:                "Validate username",
+			reqBody:             []byte(`{"username": "t", "password": "1234"}`),
+			mockExpect:          func(uc *mock.MockUseCase) {},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedContentType: utils.TextContentType,
+			requirements: func(t *testing.T, rec *httptest.ResponseRecorder) {
+				require.Equal(t, rec.Body.String(), string(httper.InvalidUsernameMsg))
+			},
+		},
+		{
+			name:                "Invalid request body",
+			reqBody:             []byte(""),
+			mockExpect:          func(uc *mock.MockUseCase) {},
+			expectedStatusCode:  http.StatusBadRequest,
+			expectedContentType: utils.TextContentType,
+			requirements:        func(t *testing.T, rec *httptest.ResponseRecorder) {},
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-	mockAuthUC := mock.NewMockUseCase(ctrl)
+			mockAuthUC := mock.NewMockUseCase(ctrl)
+			tc.mockExpect(mockAuthUC)
 
-	authHandlers := NewAuthHandlers(mockAuthUC)
-	t.Run("Main case", func(t *testing.T) {
-		user := &auth.User{
-			Username: "test",
-			Password: "test",
-		}
-		userWithToken := &auth.UserWithToken{User: &auth.User{
-			ID:        uuid.New(),
-			Username:  user.Username,
-			CreatedAt: time.Now(),
-		}, Token: "token"}
+			authHandlers := NewAuthHandlers(mockAuthUC)
 
-		body, err := json.Marshal(user)
-		require.NoError(t, err)
-		require.NotNil(t, body)
+			req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewReader(tc.reqBody))
+			req.Header.Set("Content-Type", utils.JSONContentType)
+			rec := httptest.NewRecorder()
 
-		req := httptest.NewRequest(http.MethodPost, "/login", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		rec := httptest.NewRecorder()
+			mux := chi.NewMux()
+			mux.Method("POST", "/login", authHandlers.Login())
+			mux.ServeHTTP(rec, req)
 
-		mockAuthUC.EXPECT().Login(req.Context(), gomock.Eq(user)).Return(userWithToken, nil)
-
-		handlerFunc := authHandlers.Login()
-		handlerFunc.ServeHTTP(rec, req)
-
-		require.Equal(t, rec.Code, http.StatusOK)
-		require.Equal(t, "application/json", rec.Header().Get("Content-Type"))
-	})
-	t.Run("Wrong credentials", func(t *testing.T) {
-		user := &auth.User{
-			Username: "test",
-			Password: "test2",
-		}
-
-		body, err := json.Marshal(user)
-		require.NoError(t, err)
-		require.NotNil(t, body)
-
-		req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewReader(body))
-		req.Header.Set("Content-Type", "application/json")
-		rec := httptest.NewRecorder()
-
-		mockAuthUC.EXPECT().Login(req.Context(), gomock.Eq(user)).Return(nil, httper.NewWrongCredentialsMsg())
-
-		handlerFunc := authHandlers.Login()
-		handlerFunc.ServeHTTP(rec, req)
-
-		require.Equal(t, rec.Code, http.StatusUnauthorized)
-		require.Equal(t, "text/plain; charset=utf-8", rec.Header().Get("Content-Type"))
-		require.EqualValues(t, rec.Body.String(), string(httper.WrongCredentialsMsg))
-	})
+			require.Equal(t, tc.expectedStatusCode, rec.Code)
+			require.Equal(t, tc.expectedContentType, rec.Header().Get("Content-Type"))
+			tc.requirements(t, rec)
+		})
+	}
 }

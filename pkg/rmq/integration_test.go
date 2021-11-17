@@ -1,3 +1,5 @@
+//go:build integration
+
 package rmq
 
 import (
@@ -7,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPublisherConsumerExchange(t *testing.T) {
+func TestIntegration_PublisherConsumerExchange(t *testing.T) {
 	conf := Config{
 		Proto: "amqp://",
 		Host:  "127.0.0.1",

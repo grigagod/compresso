@@ -8,12 +8,12 @@ import (
 	"github.com/grigagod/compresso/internal/utils"
 )
 
-type authHandlers struct {
+type AuthHandlers struct {
 	authUC auth.UseCase
 }
 
-func NewAuthHandlers(authUC auth.UseCase) auth.Handlers {
-	return &authHandlers{
+func NewAuthHandlers(authUC auth.UseCase) *AuthHandlers {
+	return &AuthHandlers{
 		authUC: authUC,
 	}
 }
@@ -28,7 +28,7 @@ func NewAuthHandlers(authUC auth.UseCase) auth.Handlers {
 // @Success 201 {object} auth.UserWithToken
 // @Failure 400 {string} string "Bad request msg"
 // @Router /register [post].
-func (h *authHandlers) Register() http.Handler {
+func (h *AuthHandlers) Register() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		var req AuthRequest
 
@@ -67,12 +67,17 @@ func (h *authHandlers) Register() http.Handler {
 // @Failure 401 {string} string "Wrong credentials"
 // @Failure 404 {string} string "User with such username is not found"
 // @Router /login [post].
-func (h *authHandlers) Login() http.Handler {
+func (h *AuthHandlers) Login() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		var req AuthRequest
 
 		if err := utils.StructScan(r.Body, &req); err != nil {
 			return httper.NewBadRequestError(err)
+		}
+
+		err := utils.ValidateStruct(&req)
+		if err != nil {
+			return httper.ParseValidatorError(err)
 		}
 
 		user, err := h.authUC.Login(r.Context(), &auth.User{

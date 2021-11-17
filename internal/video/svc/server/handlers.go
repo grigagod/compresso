@@ -7,7 +7,7 @@ import (
 )
 
 func (s *Server) MapHandlers() {
-	router, _ := rmq.NewRouther()
+	router, _ := rmq.NewRouter()
 	s.router = router
 	sUseCase := svcUseCase.NewSVCUseCase(s.repo, s.storage, s.logger)
 	sHandlers := sRMQ.NewSVCHandlers(sUseCase)

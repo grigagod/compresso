@@ -1,4 +1,4 @@
-.PHONY: test local lint migrate prune dev swag
+.PHONY: unit integration local lint migrate prune dev swag
 
 BUILD_DIR = $(PWD)/build
 MIGRATIONS= $(PWD)/migrations/
@@ -6,8 +6,13 @@ DATABASE = postgres://postgres:121073@localhost/compresso?sslmode=disable
 
 SHELL := /bin/bash
 
-test:
-	go test -v -timeout 30s -cover ./...
+unit:
+	go clean -testcache
+	go test -tags=unit -v -timeout 5s -cover ./...
+
+integration:
+	go clean -testcache
+	go test -tags=integration -v -timeout 30s -cover ./...
 
 lint:
 	golangci-lint run ./...

@@ -1,3 +1,5 @@
+//go:build integration
+
 package converter
 
 import (
@@ -10,7 +12,7 @@ import (
 	"time"
 )
 
-func TestProcessAudio(t *testing.T) {
+func TestIntegration_ProcessAudio(t *testing.T) {
 	t.Run("MP3toWAV", func(t *testing.T) {
 		file, err := os.Open("./testdata/lorenz.mp3")
 		if err != nil {

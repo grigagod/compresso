@@ -35,21 +35,6 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
-// GetUserByName mocks base method.
-func (m *MockRepository) GetUserByName(ctx context.Context, username string) (*auth.User, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetUserByName", ctx, username)
-	ret0, _ := ret[0].(*auth.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetUserByName indicates an expected call of GetUserByName.
-func (mr *MockRepositoryMockRecorder) GetUserByName(ctx, username interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByName", reflect.TypeOf((*MockRepository)(nil).GetUserByName), ctx, username)
-}
-
 // InsertUser mocks base method.
 func (m *MockRepository) InsertUser(ctx context.Context, user *auth.User) (*auth.User, error) {
 	m.ctrl.T.Helper()
@@ -63,4 +48,19 @@ func (m *MockRepository) InsertUser(ctx context.Context, user *auth.User) (*auth
 func (mr *MockRepositoryMockRecorder) InsertUser(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUser", reflect.TypeOf((*MockRepository)(nil).InsertUser), ctx, user)
+}
+
+// SelectUserByName mocks base method.
+func (m *MockRepository) SelectUserByName(ctx context.Context, username string) (*auth.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SelectUserByName", ctx, username)
+	ret0, _ := ret[0].(*auth.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// SelectUserByName indicates an expected call of SelectUserByName.
+func (mr *MockRepositoryMockRecorder) SelectUserByName(ctx, username interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SelectUserByName", reflect.TypeOf((*MockRepository)(nil).SelectUserByName), ctx, username)
 }

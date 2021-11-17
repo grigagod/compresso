@@ -1,3 +1,5 @@
+//go:build integration
+
 package converter
 
 import (
@@ -10,7 +12,7 @@ import (
 	"time"
 )
 
-func TestProcessVideo(t *testing.T) {
+func TestIntegration_ProcessVideo(t *testing.T) {
 	t.Run("MKVtoMKV", func(t *testing.T) {
 		file, err := os.Open("./testdata/lorenz.mkv")
 		if err != nil {

@@ -24,8 +24,8 @@ type Router struct {
 	mu       sync.RWMutex
 }
 
-// NewRouther return new router.
-func NewRouther(keyValues ...interface{}) (*Router, error) {
+// NewRouter return new router.
+func NewRouter(keyValues ...interface{}) (*Router, error) {
 	var handlers map[interface{}]Handler
 	if len(keyValues)%2 == 0 {
 		handlers = make(map[interface{}]Handler, len(keyValues)/2)

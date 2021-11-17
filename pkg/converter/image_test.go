@@ -1,3 +1,5 @@
+//go:build integration
+
 package converter
 
 import (
@@ -8,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestProcessImage(t *testing.T) {
+func TestIntegration_ProcessImage(t *testing.T) {
 	t.Run("JpgToPng", func(t *testing.T) {
 		file, err := os.Open("./testdata/test.jpg")
 		if err != nil {

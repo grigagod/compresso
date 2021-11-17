@@ -6,7 +6,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/httper"
-	"github.com/grigagod/compresso/internal/middleware"
 	"github.com/grigagod/compresso/internal/models"
 	"github.com/grigagod/compresso/internal/utils"
 	"github.com/grigagod/compresso/internal/video/api"
@@ -37,19 +36,19 @@ func NewAPIHandlers(apiUC api.UseCase) api.Handlers {
 // @Router /videos [post].
 func (h *apiHandlers) CreateVideo() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
-		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
-		if err != nil {
+		userID, ok := utils.UserIDFromContext(r.Context())
+		if !ok {
 			return httper.NewWrongCredentialsMsg()
 		}
 
-		contentType, ok := r.Context().Value(middleware.ContentTypeCtxKey{}).(string)
+		contentType, ok := utils.ContentTypeFromContext(r.Context())
 		if !ok {
-			return httper.NewNotAllowedMediaMsg()
+			return httper.NewNotAllowedContentType()
 		}
 
-		format, err := utils.DetectVideoFormatFromHeader(contentType)
-		if err != nil {
-			return httper.NewNotAllowedMediaMsg()
+		format, ok := utils.DetectVideoFormatFromHeader(contentType)
+		if !ok {
+			return httper.NewNotAllowedContentType()
 		}
 
 		video := models.Video{
@@ -84,8 +83,8 @@ func (h *apiHandlers) CreateVideo() http.Handler {
 // @Router /tickets [post].
 func (h *apiHandlers) CreateTicket() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
-		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
-		if err != nil {
+		userID, ok := utils.UserIDFromContext(r.Context())
+		if !ok {
 			return httper.NewWrongCredentialsMsg()
 		}
 
@@ -95,19 +94,17 @@ func (h *apiHandlers) CreateTicket() http.Handler {
 			return httper.NewBadRequestError(err)
 		}
 
-		err = utils.ValidateStruct(&req)
-		if err != nil {
+		if err := utils.ValidateStruct(&req); err != nil {
 			return httper.ParseValidatorError(err)
 		}
 
-		err = converter.ValidateCRF(req.CRF)
-		if err != nil {
+		if err := converter.ValidateCRF(req.CRF); err != nil {
 			return httper.NewBadRequestError(err)
 		}
 
-		target_format, err := utils.DetectVideoFormat(req.TargetFormat)
-		if err != nil {
-			return httper.NewNotAllowedMediaMsg()
+		target_format, ok := utils.DetectVideoFormat(req.TargetFormat)
+		if !ok {
+			return httper.NewNotAllowedContentType()
 		}
 
 		ticket := models.VideoTicket{
@@ -146,8 +143,8 @@ func (h *apiHandlers) CreateTicket() http.Handler {
 // @Router /videos/{id} [get].
 func (h *apiHandlers) GetVideoByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
-		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
-		if err != nil {
+		userID, ok := utils.UserIDFromContext(r.Context())
+		if !ok {
 			return httper.NewWrongCredentialsMsg()
 		}
 
@@ -182,8 +179,8 @@ func (h *apiHandlers) GetVideoByID() http.Handler {
 // @Router /tickets/{id} [get].
 func (h *apiHandlers) GetTicketByID() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
-		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
-		if err != nil {
+		userID, ok := utils.UserIDFromContext(r.Context())
+		if !ok {
 			return httper.NewWrongCredentialsMsg()
 		}
 
@@ -217,8 +214,8 @@ func (h *apiHandlers) GetTicketByID() http.Handler {
 // @Router /videos [get].
 func (h *apiHandlers) GetVideos() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
-		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
-		if err != nil {
+		userID, ok := utils.UserIDFromContext(r.Context())
+		if !ok {
 			return httper.NewWrongCredentialsMsg()
 		}
 
@@ -247,8 +244,8 @@ func (h *apiHandlers) GetVideos() http.Handler {
 // @Router /tickets [get].
 func (h *apiHandlers) GetTickets() http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
-		userID, err := uuid.Parse(r.Context().Value(middleware.UserIDCtxKey{}).(string))
-		if err != nil {
+		userID, ok := utils.UserIDFromContext(r.Context())
+		if !ok {
 			return httper.NewWrongCredentialsMsg()
 		}
 

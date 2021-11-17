@@ -20,7 +20,7 @@ func NewAuthUseCase(cfg *config.Auth, authRepo auth.Repository) *AuthUseCase {
 }
 
 func (u *AuthUseCase) Register(ctx context.Context, user *auth.User) (*auth.UserWithToken, error) {
-	existsUser, err := u.authRepo.GetUserByName(ctx, user.Username)
+	existsUser, err := u.authRepo.SelectUserByName(ctx, user.Username)
 	if existsUser != nil || err == nil {
 		return nil, httper.NewBadRequestMsg(httper.UserExistsMsg)
 	}
@@ -38,7 +38,7 @@ func (u *AuthUseCase) Register(ctx context.Context, user *auth.User) (*auth.User
 
 	token, err := utils.GenerateJWTToken(createdUser.ID, u.cfg.JwtExpires, u.cfg.JwtSecretKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "AuthUseCase.Login.GenerateJWTToken")
+		return nil, httper.ParseJWTError(errors.Wrap(err, "AuthUseCase.Login.GenerateJWTToken"))
 	}
 
 	return &auth.UserWithToken{
@@ -48,7 +48,7 @@ func (u *AuthUseCase) Register(ctx context.Context, user *auth.User) (*auth.User
 }
 
 func (u *AuthUseCase) Login(ctx context.Context, user *auth.User) (*auth.UserWithToken, error) {
-	foundUser, err := u.authRepo.GetUserByName(ctx, user.Username)
+	foundUser, err := u.authRepo.SelectUserByName(ctx, user.Username)
 	if err != nil {
 		return nil, httper.ParseSqlError(errors.Wrap(err, "AuthUseCase.Login.GetUserByName"))
 	}
@@ -61,7 +61,7 @@ func (u *AuthUseCase) Login(ctx context.Context, user *auth.User) (*auth.UserWit
 
 	token, err := utils.GenerateJWTToken(foundUser.ID, u.cfg.JwtExpires, u.cfg.JwtSecretKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "AuthUseCase.Login.GenerateJWTToken")
+		return nil, httper.ParseJWTError(errors.Wrap(err, "AuthUseCase.Login.GenerateJWTToken"))
 	}
 
 	return &auth.UserWithToken{
