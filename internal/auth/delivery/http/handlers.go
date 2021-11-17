@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/httper"
 	"github.com/grigagod/compresso/internal/utils"
@@ -42,6 +43,7 @@ func (h *AuthHandlers) Register() http.Handler {
 		}
 
 		user, err := h.authUC.Register(r.Context(), &auth.User{
+			ID:       uuid.New(),
 			Username: req.Username,
 			Password: req.Password,
 		})
