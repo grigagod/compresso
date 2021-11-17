@@ -37,9 +37,9 @@ func TestAuthRepo_InsertUser(t *testing.T) {
 		rows := sqlmock.NewRows([]string{"user_id", "username", "password", "created_at"}).AddRow(
 			&user.ID, "test", "test", &user.CreatedAt)
 
-		query := `INSERT INTO svc.users(username, password) VALUES($1, $2) RETURNING *`
+		query := `INSERT INTO svc.users(user_id, username, password) VALUES($1, $2, $3) RETURNING *`
 		mock.ExpectQuery(query).
-			WithArgs(&user.Username, &user.Password).
+			WithArgs(&user.ID, &user.Username, &user.Password).
 			WillReturnRows(rows)
 
 		createdUser, err := authRepo.InsertUser(context.Background(), user)

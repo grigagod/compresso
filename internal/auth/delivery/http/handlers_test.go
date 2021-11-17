@@ -1,5 +1,3 @@
-//go:build unit
-
 package http
 
 import (
@@ -8,11 +6,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/golang/mock/gomock"
-	"github.com/google/uuid"
 	"github.com/grigagod/compresso/internal/auth"
 	"github.com/grigagod/compresso/internal/auth/mock"
 	"github.com/grigagod/compresso/internal/httper"
@@ -29,10 +25,7 @@ var (
 	authBody      = []byte(`{"username": "test", "password": "test"}`)
 	userWithToken = &auth.UserWithToken{
 		User: &auth.User{
-			ID:        uuid.New(),
-			Username:  user.Username,
-			Password:  "",
-			CreatedAt: time.Now(),
+			Password: "",
 		},
 	}
 )
@@ -50,7 +43,7 @@ func TestAuthHandlers_Register(t *testing.T) {
 			name:    "Main case",
 			reqBody: authBody,
 			mockExpect: func(uc *mock.MockUseCase) {
-				uc.EXPECT().Register(gomock.Any(), gomock.Eq(user)).Return(userWithToken, nil)
+				uc.EXPECT().Register(gomock.Any(), gomock.AssignableToTypeOf(user)).Return(userWithToken, nil)
 			},
 			expectedStatusCode:  http.StatusCreated,
 			expectedContentType: utils.JSONContentType,
@@ -64,7 +57,7 @@ func TestAuthHandlers_Register(t *testing.T) {
 			name:    "User exists",
 			reqBody: authBody,
 			mockExpect: func(uc *mock.MockUseCase) {
-				uc.EXPECT().Register(gomock.Any(), gomock.Eq(user)).Return(nil, httper.NewBadRequestMsg(httper.UserExistsMsg))
+				uc.EXPECT().Register(gomock.Any(), gomock.AssignableToTypeOf(user)).Return(nil, httper.NewBadRequestMsg(httper.UserExistsMsg))
 			},
 			expectedStatusCode:  http.StatusBadRequest,
 			expectedContentType: utils.TextContentType,
@@ -140,7 +133,7 @@ func TestAuthHandlers_Login(t *testing.T) {
 			name:    "Main case",
 			reqBody: authBody,
 			mockExpect: func(uc *mock.MockUseCase) {
-				uc.EXPECT().Login(gomock.Any(), gomock.Eq(user)).Return(userWithToken, nil)
+				uc.EXPECT().Login(gomock.Any(), gomock.AssignableToTypeOf(user)).Return(userWithToken, nil)
 			},
 			expectedStatusCode:  http.StatusOK,
 			expectedContentType: utils.JSONContentType,
@@ -155,7 +148,7 @@ func TestAuthHandlers_Login(t *testing.T) {
 			name:    "Wrong credentials",
 			reqBody: authBody,
 			mockExpect: func(uc *mock.MockUseCase) {
-				uc.EXPECT().Login(gomock.Any(), gomock.Eq(user)).Return(nil, httper.NewWrongCredentialsMsg())
+				uc.EXPECT().Login(gomock.Any(), gomock.AssignableToTypeOf(user)).Return(nil, httper.NewWrongCredentialsMsg())
 			},
 			expectedStatusCode:  http.StatusUnauthorized,
 			expectedContentType: utils.TextContentType,
