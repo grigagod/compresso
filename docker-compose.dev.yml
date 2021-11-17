@@ -6,7 +6,7 @@ services:
       context: ./
       dockerfile: docker/auth/Dockerfile
     ports:
-      - "5000:5000"
+      - "${AUTH_ADDR}:${AUTH_ADDR}"
     depends_on:
       postgresql:
         condition: service_healthy
@@ -21,7 +21,7 @@ services:
       context: ./
       dockerfile: docker/videoapi/Dockerfile
     ports:
-      - "5001:5001"
+      - "${VIDEO_ADDR}:${VIDEO_ADDR}"
     depends_on:
       postgresql:
         condition: service_healthy

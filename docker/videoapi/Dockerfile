@@ -22,8 +22,6 @@ COPY --from=builder ["/videoapi/docs/videoapi/", "/docs/videoapi/"]
 # Copy certificates
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-# Export necessary port.
-EXPOSE 5001
 
 # Command to run when starting the container.
 ENTRYPOINT ["/videoapibin"]

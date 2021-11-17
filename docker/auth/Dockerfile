@@ -16,8 +16,5 @@ FROM scratch
 COPY --from=builder ["/auth/authbin", "/"]
 COPY --from=builder ["/auth/docs/auth/", "/docs/auth/"]
 
-# Export necessary port.
-EXPOSE 5000
-
 # Command to run when starting the container.
 ENTRYPOINT ["/authbin"]
