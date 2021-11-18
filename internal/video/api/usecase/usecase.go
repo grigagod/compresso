@@ -183,6 +183,8 @@ func (u *APIUseCase) signTicketURL(ticket *models.VideoTicket) error {
 			return err
 		}
 		ticket.URL = url
+	} else {
+		ticket.URL = ""
 	}
 
 	return nil
